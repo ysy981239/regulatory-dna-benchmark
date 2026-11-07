@@ -1,0 +1,161 @@
+{
+  "dataset": "human_nontata_promoters",
+  "n_rows": 27097,
+  "width": 251,
+  "val_frac": 0.15,
+  "seed": 0,
+  "sweep": [
+    {
+      "k": 12,
+      "n_clusters": 1,
+      "largest": 27097,
+      "largest_frac": 1.0,
+      "mean_size": 27097.0,
+      "median_size": 27097,
+      "singletons": 0,
+      "pairs_direct": 1022386,
+      "pairs_closure": 367110156,
+      "amplification": 359.1,
+      "val_rows": 27097,
+      "train_rows": 0,
+      "largest_in_train": false
+    },
+    {
+      "k": 15,
+      "n_clusters": 722,
+      "largest": 26234,
+      "largest_frac": 0.9682,
+      "mean_size": 37.53,
+      "median_size": 1,
+      "singletons": 664,
+      "pairs_direct": 148350,
+      "pairs_closure": 344098769,
+      "amplification": 2319.5,
+      "val_rows": 26689,
+      "train_rows": 408,
+      "largest_in_train": false
+    },
+    {
+      "k": 18,
+      "n_clusters": 8847,
+      "largest": 12945,
+      "largest_frac": 0.4777,
+      "mean_size": 3.06,
+      "median_size": 1,
+      "singletons": 7955,
+      "pairs_direct": 56155,
+      "pairs_closure": 83910123,
+      "amplification": 1494.3,
+      "val_rows": 4093,
+      "train_rows": 23004,
+      "largest_in_train": true
+    },
+    {
+      "k": 20,
+      "n_clusters": 12254,
+      "largest": 8307,
+      "largest_frac": 0.3066,
+      "mean_size": 2.21,
+      "median_size": 1,
+      "singletons": 11378,
+      "pairs_direct": 44753,
+      "pairs_closure": 34664745,
+      "amplification": 774.6,
+      "val_rows": 9384,
+      "train_rows": 17713,
+      "largest_in_train": false
+    },
+    {
+      "k": 22,
+      "n_clusters": 13489,
+      "largest": 6574,
+      "largest_frac": 0.2426,
+      "mean_size": 2.01,
+      "median_size": 1,
+      "singletons": 12682,
+      "pairs_direct": 39300,
+      "pairs_closure": 21785035,
+      "amplification": 554.3,
+      "val_rows": 4065,
+      "train_rows": 23032,
+      "largest_in_train": true
+    },
+    {
+      "k": 25,
+      "n_clusters": 14189,
+      "largest": 5533,
+      "largest_frac": 0.2042,
+      "mean_size": 1.91,
+      "median_size": 1,
+      "singletons": 13479,
+      "pairs_direct": 34263,
+      "pairs_closure": 15498793,
+      "amplification": 452.3,
+      "val_rows": 4065,
+      "train_rows": 23032,
+      "largest_in_train": true
+    }
+  ],
+  "largest_component_kmers": {
+    "k": 20,
+    "size": 8307,
+    "top": [
+      {
+        "kmer": "AAAAAAAAAAAAAAAAAAAA",
+        "rows_in_component": 38,
+        "frac_of_component": 0.0046,
+        "rows_in_dataset": 1,
+        "frac_of_dataset": 0.0
+      },
+      {
+        "kmer": "TTTTTTTTTTTTTTTTTTTT",
+        "rows_in_component": 30,
+        "frac_of_component": 0.0036,
+        "rows_in_dataset": 3,
+        "frac_of_dataset": 0.0001
+      },
+      {
+        "kmer": "AAGAAGAAGAAGAAGAAGAA",
+        "rows_in_component": 28,
+        "frac_of_component": 0.0034,
+        "rows_in_dataset": 28,
+        "frac_of_dataset": 0.001
+      },
+      {
+        "kmer": "TCTCTCTCTCTCTCTCTCTC",
+        "rows_in_component": 27,
+        "frac_of_component": 0.0033,
+        "rows_in_dataset": 20,
+        "frac_of_dataset": 0.0007
+      },
+      {
+        "kmer": "CTCTCTCTCTCTCTCTCTCT",
+        "rows_in_component": 27,
+        "frac_of_component": 0.0033,
+        "rows_in_dataset": 1,
+        "frac_of_dataset": 0.0
+      },
+      {
+        "kmer": "AGAAGAAGAAGAAGAAGAAG",
+        "rows_in_component": 27,
+        "frac_of_component": 0.0033,
+        "rows_in_dataset": 27,
+        "frac_of_dataset": 0.001
+      },
+      {
+        "kmer": "GAAGAAGAAGAAGAAGAAGA",
+        "rows_in_component": 27,
+        "frac_of_component": 0.0033,
+        "rows_in_dataset": 27,
+        "frac_of_dataset": 0.001
+      },
+      {
+        "kmer": "TTTTTTTTTTTTTTTTTTTT",
+        "rows_in_component": 24,
+        "frac_of_component": 0.0029,
+        "rows_in_dataset": 3,
+        "frac_of_dataset": 0.0001
+      }
+    ]
+  }
+}

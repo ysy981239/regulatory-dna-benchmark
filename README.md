@@ -97,6 +97,8 @@ Read the promoters block top to bottom: the whole range from a GC-content counte
 
 The two Drosophila Basset rows were retrained after the padding audit ([docs/DEVLOG.md](docs/DEVLOG.md) P1/P2); the dilated row is the older run and is annotated accordingly — its retraining costs ~4 h on a 6 GB laptop GPU and is left in the table so the before/after contrast stays visible. A padded-only bug cannot touch the promoter rows: those windows are a fixed 251 bp and contain no padding at all.
 
+The leak figure quoted above (77% / 55%) is the unfiltered one. It was later stress-tested against sequence complexity (`scripts/complexity_probe.py`, [docs/DEVLOG.md](docs/DEVLOG.md) E4): the largest "homology" component turns out to be chained together by low-complexity repeats such as `ATTTATATATTTATATATTT`, and removing k-mers below 1.5 bits of base-composition entropy brings the figure to **59%** for enhancers and **50%** for promoters. The unfiltered number is also the one where `k = 20` is the *smallest* threshold at which the grouped split still leaves anything to hold out — both facts are reported rather than sanded off.
+
 ## Repository layout
 
 ```
@@ -115,9 +117,11 @@ scripts/
   position_probe.py    circular-shift probe (destroys absolute position only)
   motif_analysis.py    IG x ISM agreement, PWM extraction, in-silico variant table
   padding_check.py     padding fraction, length/prediction correlation, truncation cost
+  cluster_sensitivity.py  sweep the "same family" k threshold; which k-mers glue the giant component
+  complexity_probe.py  entropy-filtered leak audit: how much sharing survives without low-complexity repeats
   make_table.py        aggregate runs/*/metrics.json into reports/summary.md
 tests/test_core.py     9 assertions covering the parts where a silent bug would invert a conclusion
-docs/DEVLOG.md         the 14 bugs found after the pipeline already "worked"
+docs/DEVLOG.md         the 15 problems found after the pipeline already "worked"
 ```
 
 ## Documents

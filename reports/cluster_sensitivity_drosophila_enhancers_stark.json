@@ -1,0 +1,176 @@
+{
+  "dataset": "drosophila_enhancers_stark",
+  "n_rows": 5184,
+  "width": 3237,
+  "val_frac": 0.15,
+  "seed": 0,
+  "sweep": [
+    {
+      "k": 12,
+      "n_clusters": 1,
+      "largest": 5184,
+      "largest_frac": 1.0,
+      "mean_size": 5184.0,
+      "median_size": 5184,
+      "singletons": 0,
+      "pairs_direct": 2690020,
+      "pairs_closure": 13434336,
+      "amplification": 5.0,
+      "val_rows": 5184,
+      "train_rows": 0,
+      "largest_in_train": false
+    },
+    {
+      "k": 15,
+      "n_clusters": 1,
+      "largest": 5184,
+      "largest_frac": 1.0,
+      "mean_size": 5184.0,
+      "median_size": 5184,
+      "singletons": 0,
+      "pairs_direct": 223700,
+      "pairs_closure": 13434336,
+      "amplification": 60.1,
+      "val_rows": 5184,
+      "train_rows": 0,
+      "largest_in_train": false
+    },
+    {
+      "k": 18,
+      "n_clusters": 268,
+      "largest": 4905,
+      "largest_frac": 0.9462,
+      "mean_size": 19.34,
+      "median_size": 1,
+      "singletons": 257,
+      "pairs_direct": 34396,
+      "pairs_closure": 12027074,
+      "amplification": 349.7,
+      "val_rows": 4930,
+      "train_rows": 254,
+      "largest_in_train": false
+    },
+    {
+      "k": 20,
+      "n_clusters": 1309,
+      "largest": 3723,
+      "largest_frac": 0.7182,
+      "mean_size": 3.96,
+      "median_size": 1,
+      "singletons": 1189,
+      "pairs_direct": 18401,
+      "pairs_closure": 6928705,
+      "amplification": 376.5,
+      "val_rows": 778,
+      "train_rows": 4406,
+      "largest_in_train": true
+    },
+    {
+      "k": 22,
+      "n_clusters": 2246,
+      "largest": 2608,
+      "largest_frac": 0.5031,
+      "mean_size": 2.31,
+      "median_size": 1,
+      "singletons": 1986,
+      "pairs_direct": 12430,
+      "pairs_closure": 3399965,
+      "amplification": 273.5,
+      "val_rows": 778,
+      "train_rows": 4406,
+      "largest_in_train": true
+    },
+    {
+      "k": 25,
+      "n_clusters": 3158,
+      "largest": 1430,
+      "largest_frac": 0.2758,
+      "mean_size": 1.64,
+      "median_size": 1,
+      "singletons": 2727,
+      "pairs_direct": 8927,
+      "pairs_closure": 1022593,
+      "amplification": 114.6,
+      "val_rows": 778,
+      "train_rows": 4406,
+      "largest_in_train": true
+    },
+    {
+      "k": 30,
+      "n_clusters": 3793,
+      "largest": 511,
+      "largest_frac": 0.0986,
+      "mean_size": 1.37,
+      "median_size": 1,
+      "singletons": 3220,
+      "pairs_direct": 7158,
+      "pairs_closure": 132682,
+      "amplification": 18.5,
+      "val_rows": 779,
+      "train_rows": 4405,
+      "largest_in_train": true
+    }
+  ],
+  "largest_component_kmers": {
+    "k": 20,
+    "size": 3723,
+    "top": [
+      {
+        "kmer": "ATTTATATATTTATATATTT",
+        "rows_in_component": 71,
+        "frac_of_component": 0.0191,
+        "rows_in_dataset": 71,
+        "frac_of_dataset": 0.0137
+      },
+      {
+        "kmer": "ATATTTATATATTTATATAT",
+        "rows_in_component": 71,
+        "frac_of_component": 0.0191,
+        "rows_in_dataset": 71,
+        "frac_of_dataset": 0.0137
+      },
+      {
+        "kmer": "TATATTTATATATTTATATA",
+        "rows_in_component": 71,
+        "frac_of_component": 0.0191,
+        "rows_in_dataset": 71,
+        "frac_of_dataset": 0.0137
+      },
+      {
+        "kmer": "ATATATTTATATATTTATAT",
+        "rows_in_component": 71,
+        "frac_of_component": 0.0191,
+        "rows_in_dataset": 71,
+        "frac_of_dataset": 0.0137
+      },
+      {
+        "kmer": "TATATATTTATATATTTATA",
+        "rows_in_component": 71,
+        "frac_of_component": 0.0191,
+        "rows_in_dataset": 71,
+        "frac_of_dataset": 0.0137
+      },
+      {
+        "kmer": "TTATATATTTATATATTTAT",
+        "rows_in_component": 71,
+        "frac_of_component": 0.0191,
+        "rows_in_dataset": 71,
+        "frac_of_dataset": 0.0137
+      },
+      {
+        "kmer": "TATTTATATATTTATATATT",
+        "rows_in_component": 71,
+        "frac_of_component": 0.0191,
+        "rows_in_dataset": 71,
+        "frac_of_dataset": 0.0137
+      },
+      {
+        "kmer": "ATAATAATAATAATAATAAT",
+        "rows_in_component": 71,
+        "frac_of_component": 0.0191,
+        "rows_in_dataset": 1,
+        "frac_of_dataset": 0.0002
+      }
+    ]
+  }
+}

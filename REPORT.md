@@ -18,7 +18,7 @@ I benchmarked three from-scratch sequence architectures (a Basset-style CNN, a d
 
 The honest one-line conclusion: **on human promoters this benchmark measures composition, not grammar; on Drosophila enhancers it measures something that genuinely depends on order.**
 
-**Post-hoc audit.** All seven findings were already written up when I asked a simpler question — "what does the padding actually do?" — and found two more bugs: the global pooling averaged over padded positions, and the train and test tensors were not even the same width (236–3,237 bp sequences are right-padded, and the padding length was computed per split). Neither raised an exception. Both were repaired and the Drosophila runs retrained; `docs/DEVLOG.md` lists the 14 issues found after the pipeline "worked", with the before/after numbers. The Drosophila calibration numbers in this report improved enough to change a conclusion (its Brier score is no longer worse than a constant predictor), so the numbers below are the corrected ones and the promoter numbers are untouched — those inputs contain no padding at all.
+**Post-hoc audit.** All seven findings were already written up when I asked a simpler question — "what does the padding actually do?" — and found two more bugs: the global pooling averaged over padded positions, and the train and test tensors were not even the same width (236–3,237 bp sequences are right-padded, and the padding length was computed per split). Neither raised an exception. Both were repaired and the Drosophila runs retrained; `docs/DEVLOG.md` lists the 15 issues found after the pipeline "worked", with the before/after numbers. The Drosophila calibration numbers in this report improved enough to change a conclusion (its Brier score is no longer worse than a constant predictor), so the numbers below are the corrected ones and the promoter numbers are untouched — those inputs contain no padding at all.
 
 ---
 
@@ -44,6 +44,14 @@ The 20-mer clustering threshold is justified arithmetically: $4^{20} \approx 1.1
 Two consequences. First, a random split puts ~75% of validation rows in the same family as a training row, so validation measures memorisation. Second, **the official test score cannot be de-leaked** — the fix is to report the number with its contamination attached, not to claim it was removed.
 
 A diagnostic worth keeping: pairwise comparison finds 13,219 directly-sharing pairs, but the 3,723-row component implies 6,928,705 forced-together pairs — a **524× amplification** from transitive closure. Any per-item grouping rule (hashing, greedy assignment) would have missed 99.8% of them.
+
+The threshold behind both numbers — "same family" = shares at least one exact 20-mer — was never validated, so it was swept (`scripts/cluster_sensitivity.py`) and then stress-tested against sequence complexity (`scripts/complexity_probe.py`). Two things came out.
+
+**The split only exists for k ≥ 20.** At k = 18 the largest component already swallows 95% of the Drosophila training set, so validation would have to take 4,930 of 5,184 rows; at k = 15 everything collapses into one component and the split has nothing to hold out. k = 20 is not a principled constant — it is the smallest value at which the protocol still functions, which is a fragility, not a justification.
+
+**The largest component is chained by low-complexity repeats, not by homology.** The most widespread 20-mers inside the 3,723-row component are AT-only microsatellites such as `ATTTATATATTTATATATTT` and `ATAATAATAATAATAATAAT` (71 rows each, 1.9% of the component), and in the promoter component they are homopolymers (`AAAAAAAAAAAAAAAAAAAA`, 38 rows). Dropping k-mers whose base-composition entropy is below 1.5 bits (a 20-mer over only A and T has entropy ≤ 1 bit) leaves the sharing at **59.5%** on Drosophila and **49.9%** on promoters, and shrinks the largest component from 72% to 40%.
+
+The two datasets respond differently, which is itself informative: promoter sharing barely moves (57.8% → 47.9% across the whole entropy range) because CpG islands really are similar to each other, while enhancer sharing drops by 37 points because much of it was AT-repeat noise. The defensible headline is therefore **"at least 59% of enhancer and 50% of promoter test rows share a 20-mer with train"**, and the residual is genuine sequence similarity rather than low-complexity junk.
 
 ## 3. Finding 2 — what the random split is worth
 

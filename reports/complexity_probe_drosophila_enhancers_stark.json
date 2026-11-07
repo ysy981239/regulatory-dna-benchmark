@@ -1,0 +1,59 @@
+{
+  "dataset": "drosophila_enhancers_stark",
+  "k": 20,
+  "n_train": 5184,
+  "n_test": 1730,
+  "frac_at_only": 0.0035,
+  "leakage": [
+    {
+      "min_entropy_bits": 0.0,
+      "train_kmers_kept": 10157356,
+      "test_rows_sharing": 1336,
+      "frac_test_sharing": 0.7723
+    },
+    {
+      "min_entropy_bits": 1.2,
+      "train_kmers_kept": 10037437,
+      "test_rows_sharing": 1205,
+      "frac_test_sharing": 0.6965
+    },
+    {
+      "min_entropy_bits": 1.5,
+      "train_kmers_kept": 9406476,
+      "test_rows_sharing": 1030,
+      "frac_test_sharing": 0.5954
+    },
+    {
+      "min_entropy_bits": 1.7,
+      "train_kmers_kept": 7894610,
+      "test_rows_sharing": 885,
+      "frac_test_sharing": 0.5116
+    },
+    {
+      "min_entropy_bits": 1.9,
+      "train_kmers_kept": 3459873,
+      "test_rows_sharing": 700,
+      "frac_test_sharing": 0.4046
+    }
+  ],
+  "clustering": [
+    {
+      "min_entropy_bits": 1.2,
+      "n_clusters": 1844,
+      "largest": 3054,
+      "largest_frac": 0.5891
+    },
+    {
+      "min_entropy_bits": 1.5,
+      "n_clusters": 2506,
+      "largest": 2099,
+      "largest_frac": 0.4049
+    },
+    {
+      "min_entropy_bits": 1.7,
+      "n_clusters": 3049,
+      "largest": 1371,
+      "largest_frac": 0.2645
+    }
+  ]
+}

@@ -114,6 +114,8 @@ cd D:\kaggle\genomics
 
 > drosophila 的 basset 两行是修掉 padding bug 之后重训重测的；dilated 重训约 4 h，故保留修复前那一行并标注。promoters 的窗口本来就没有 padding，不受这个 bug 影响，数字未变。前后对比见 [`docs/DEVLOG.md`](docs/DEVLOG.md)。
 
+> **泄漏率后来被重新标定过。** 上面 77% / 55% 是未过滤的数。用 `scripts/complexity_probe.py` 按碱基组成熵筛掉低复杂度 k-mer（只由 A+T 组成的 20-mer 熵 ≤ 1 bit）之后，drosophila 掉到 **59%**、启动子掉到 **50%**；用 `scripts/cluster_sensitivity.py` 扫阈值则发现 **k=20 是「分组划分还能成立」的最小值**（k≤18 时最大连通分量已占 95–100%，val 无处可留）。两个数都照实写着，没有打磨掉。
+
 **五条实测结论（前四条是负面的，这才是项目的价值所在）：**
 
 1. **官方 test split 自己就泄漏**：drosophila 有 **77.2%**、promoters 有 **54.8%** 的 test 序列与训练集共享 20-mer。所以无论怎么切 train/val，test 上的数字都会偏乐观。
@@ -178,7 +180,7 @@ genomics/
 
 > 下面这些不是「听说」，是这个仓库里真实发生并修掉的 bug。写进 report 的「教训」一节，比多刷 0.5 个点更值钱。
 
-- **k-mer 编码里含 N 的窗口必须用与批次无关的哨兵值**：曾用「行号」做哨兵，而逐行探测时行号恒为 0，导致所有 padding 尾巴互相「匹配」，泄漏率被算成 99.9%（真实是 54.8%）。现在用行内容 `blake2b` 哈希。**这个 bug 会把你项目的核心结论写反。**
+- **k-mer 编码里含 N 的窗口必须用与批次无关的哨兵值**：曾用「行号」做哨兵，而逐行探测时行号恒为 0，导致所有 padding 尾巴互相「匹配」，泄漏率被算成 99.9%（drosophila 真实是 77.2%，启动子 54.8%）。现在用行内容 `blake2b` 哈希。**这个 bug 会把你项目的核心结论写反。**
 - **学习率调度按 step 定义、却按 epoch 步进**（已修）：`total_steps` 曾写成 `epochs * len(train_loader)`，但 `sched.step()` 每 epoch 只调一次，于是整个训练卡在线性 warmup 里，30 个 epoch 后 lr 只到设定值的 29%，cosine 退火一次都没发生。实测 lr 从 9.71e-06 单调升到 2.91e-04。**症状**：loss 一直缓慢下降、从不平台化，val 指标总觉得「再训久一点会更好」。
 - **`LambdaLR` 构造时调用 `lr_lambda(0)`**（已修）：`warmup=1` 时它返回 0，第一个 epoch 在 lr=0 下空转，白烧 1/30 预算。修法是 `step = max(step, 1)`。
 - **早停会吃掉 cosine 退火**（已修，`--patience` 默认改为 0）：验证集在退火前约 2/3 处就到峰值，`patience=8` 会在峰值后立刻停机，最后 10 个 epoch 的低学习率精调全被砍掉。promoters 上就因此在 epoch 19/30 停了。

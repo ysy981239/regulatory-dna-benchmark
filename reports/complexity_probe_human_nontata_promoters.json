@@ -1,0 +1,59 @@
+{
+  "dataset": "human_nontata_promoters",
+  "k": 20,
+  "n_train": 27097,
+  "n_test": 9034,
+  "frac_at_only": 0.0088,
+  "leakage": [
+    {
+      "min_entropy_bits": 0.0,
+      "train_kmers_kept": 3915707,
+      "test_rows_sharing": 5225,
+      "frac_test_sharing": 0.5784
+    },
+    {
+      "min_entropy_bits": 1.2,
+      "train_kmers_kept": 3806220,
+      "test_rows_sharing": 4770,
+      "frac_test_sharing": 0.528
+    },
+    {
+      "min_entropy_bits": 1.5,
+      "train_kmers_kept": 3361414,
+      "test_rows_sharing": 4510,
+      "frac_test_sharing": 0.4992
+    },
+    {
+      "min_entropy_bits": 1.7,
+      "train_kmers_kept": 2584548,
+      "test_rows_sharing": 4418,
+      "frac_test_sharing": 0.489
+    },
+    {
+      "min_entropy_bits": 1.9,
+      "train_kmers_kept": 946812,
+      "test_rows_sharing": 4325,
+      "frac_test_sharing": 0.4787
+    }
+  ],
+  "clustering": [
+    {
+      "min_entropy_bits": 1.2,
+      "n_clusters": 13705,
+      "largest": 6283,
+      "largest_frac": 0.2319
+    },
+    {
+      "min_entropy_bits": 1.5,
+      "n_clusters": 14344,
+      "largest": 5933,
+      "largest_frac": 0.219
+    },
+    {
+      "min_entropy_bits": 1.7,
+      "n_clusters": 14499,
+      "largest": 5744,
+      "largest_frac": 0.212
+    }
+  ]
+}

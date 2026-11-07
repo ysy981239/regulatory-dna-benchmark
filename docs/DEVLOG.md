@@ -16,6 +16,7 @@ right.
 | E1 | metrics | a constant predictor reported AUROC 0.5 instead of "undefined" | medium | unit test |
 | E2 | clustering | the leak audit reported 99.9% test/train overlap for *every* split, including the homologous one (which had 0 by construction) | high | the two numbers contradicted each other |
 | E3 | metrics | the reported F1 used a threshold tuned on the same predictions it was scored on | medium | writing the DEVLOG, asking "what would a reviewer attack" |
+| E4 | clustering | the k=20 "same family" threshold was never validated, and the giant component turns out to be chained by low-complexity repeats | high | asking "does the grouped split actually do anything" |
 | T1 | schedule | the LR never left the linear warmup: cosine annealing never happened | high | reading the LR trace, not the loss |
 | T2 | schedule | epoch 1 trained at lr = 0 | medium | same trace |
 | T3 | training | early stopping fired during the warmup plateau and cut the annealed tail | medium | run ended at epoch 19 of 30 |
@@ -116,6 +117,45 @@ tails of two different rows must not intersect.
 
 **Lesson.** The contradictory pair of numbers (99.9% overlap *and* 0 shared
 clusters) was the only signal.  Neither number alone looked wrong.
+
+## E4 — the "same family" threshold was never validated
+
+**Symptom.** None. `k = 20` looked like a reasonable default, and both the leak audit and the grouped split inherited it silently.
+
+**What it decides.** The entire hold-out protocol. "Two sequences are the same family" is defined as *shares at least one exact k-mer*, so `k` sets both how much of the test set counts as contaminated and which rows can serve as validation.
+
+**Sweep (`scripts/cluster_sensitivity.py`).** Largest connected component and the resulting validation size:
+
+| k | Drosophila: clusters / largest / val rows | Promoters: clusters / largest / val rows |
+|---|---|---|
+| 12 | 1 / 5,184 (100%) / 5,184 | 1 / 27,097 (100%) / 27,097 |
+| 15 | 1 / 5,184 (100%) / 5,184 | 722 / 26,234 (97%) / 26,689 |
+| 18 | 268 / 4,905 (95%) / 4,930 | 8,847 / 12,945 (48%) / 4,093 |
+| **20** | **1,309 / 3,723 (72%) / 778** | **12,254 / 8,307 (31%) / 9,384** |
+| 22 | 2,246 / 2,608 (50%) / 778 | 13,489 / 6,574 (24%) / 4,065 |
+| 25 | 3,158 / 1,430 (28%) / 778 | 14,189 / 5,533 (20%) / 4,065 |
+| 30 | 3,793 / 511 (10%) / 779 | — |
+
+`k = 20` is **the smallest value at which the protocol still works at all**: at k ≤ 18 the split would have to put 95–100% of the training set into validation. That is fragility, not justification, and it should have been reported as such from the beginning.
+
+**Second finding — the component is not a family.** The most widespread 20-mers *inside* the largest component are low-complexity repeats, not conserved sequence:
+
+| dataset | top 20-mer in the largest component | rows |
+|---|---|---|
+| Drosophila | `ATTTATATATTTATATATTT` (AT microsatellite) | 71 (1.9% of the component) |
+| Drosophila | `ATAATAATAATAATAATAAT` | 71 |
+| promoters | `AAAAAAAAAAAAAAAAAAAA` | 38 (0.5%) |
+| promoters | `AAGAAGAAGAAGAAGAAGAA` | 28 |
+
+No single k-mer dominates — the component is chained through *many* weak links of ~1% each, which is exactly the signature of a shared repeat rather than a shared ancestor.
+
+**Quantified (`scripts/complexity_probe.py`).** A 20-mer built only from A and T has base-composition entropy ≤ 1 bit, so a minimum-entropy filter removes repeats while keeping real sequence. Drosophila: 77.2% → 69.7% (≥1.2 bits) → **59.5%** (≥1.5) → 51.2% (≥1.7) → 40.5% (≥1.9), and the largest component shrinks 72% → 59% → 40% → 26%. Promoters barely move: 57.8% → **49.9%** → 48.9% → 47.9%.
+
+**Interpretation.** Enhancer sharing is roughly one third AT-repeat noise, two thirds real similarity. Promoter sharing is genuine CpG-island similarity. So the headline was not wrong, but it was overstated: the defensible statement is *at least* 59% (enhancers) / 50% (promoters), not 77% / 55%.
+
+**Side finding.** `reports/leakage_*.json` reports 54.8% for promoters because `leakage_report` subsamples train to 20,000 rows; the full 27,097-row pool gives 57.8%. The published number is a slight *under*-estimate, which is the harmless direction.
+
+**Lesson.** Any constant that carries a conclusion needs (a) a sweep showing where the conclusion breaks and (b) a mechanism test showing *why* the grouping happened. Both were one script away and neither was written until the split's value was challenged.
 
 ## T1 / T2 / T3 — the learning-rate schedule was never executed
 
