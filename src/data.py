@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import gzip
 import hashlib
+import json
 import os
 import shutil
 import urllib.request
@@ -35,13 +36,15 @@ DATA_DIR = ROOT / "data"
 DATASETS = {
     "drosophila_enhancers_stark": dict(
         task="enhancer vs non-enhancer", species="Drosophila melanogaster",
-        n_train=5184, n_test=1730, difficulty="easy",
+        n_train=5184, n_test=1730, difficulty="easy", max_len=3237,
         note="smallest benchmark; use it to debug the pipeline in minutes",
     ),
     "human_nontata_promoters": dict(
         task="promoter vs non-promoter", species="Homo sapiens",
-        n_train=27097, n_test=9034, difficulty="medium",
-        note="recommended first real target: plenty of signal, still fast on 6 GB",
+        n_train=27097, n_test=9034, difficulty="medium", max_len=251,
+        note="all windows are 251 bp centred on the TSS; the positives are the "
+             "annotated *non-TATA* (CpG-island / housekeeping) promoters, so a "
+             "composition-only baseline already explains most of the signal",
     ),
     "human_enhancers_cohn": dict(
         task="enhancer vs non-enhancer", species="Homo sapiens",
@@ -107,6 +110,55 @@ def _read_csv_gz(path: Path):
     return df
 
 
+def _pinned_max_len(dataset: str) -> int | None:
+    """Padding length for ``dataset`` if it is already known, else ``None``.
+
+    Known means: pinned in the registry, or recorded from an earlier load of any
+    split of this dataset.  Lets a cache hit avoid re-parsing the CSV just to
+    rediscover the maximum sequence length.
+    """
+    pinned = DATASETS.get(dataset, {}).get("max_len")
+    if pinned is not None:
+        return int(pinned)
+    path = DATA_DIR / "cache" / "max_len.json"
+    if not path.exists():
+        return None
+    try:
+        return int(json.loads(path.read_text())[dataset])
+    except (OSError, ValueError, KeyError, TypeError):
+        return None
+
+
+def _dataset_max_len(dataset: str, split_max: int) -> int:
+    """One padding length per *dataset*, shared by all of its splits.
+
+    Old behaviour took the max inside each split, which gave the drosophila
+    train split 3237 and its test split 3061 - i.e. the same model silently saw
+    a different tensor width at test time (see docs/DEVLOG.md, issue P2).
+    Resolution order: registry value if pinned, else the largest length seen for
+    this dataset so far (persisted in ``data/cache/max_len.json``).
+
+    Never returns less than ``split_max``: truncating a real sequence to match an
+    earlier, shorter split would destroy data, whereas padding is harmless.
+    """
+    pinned = DATASETS.get(dataset, {}).get("max_len")
+    if pinned is not None:
+        return max(int(pinned), int(split_max))
+    path = DATA_DIR / "cache" / "max_len.json"
+    seen: dict = {}
+    if path.exists():
+        try:
+            seen = json.loads(path.read_text())
+        except (OSError, ValueError):
+            seen = {}
+    best = max(int(seen.get(dataset, 0)), int(split_max))
+    if seen.get(dataset) != best:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        seen[dataset] = best
+        path.write_text(json.dumps(seen, indent=2, sort_keys=True))
+    return best
+
+
 def load_split(dataset: str, split: str, root: Path | None = None,
                max_len: int | None = None, endpoint: str | None = None,
                use_cache: bool = True):
@@ -115,26 +167,41 @@ def load_split(dataset: str, split: str, root: Path | None = None,
     Caches the encoded arrays as ``.npz`` so repeated runs do not re-parse 100 MB
     of CSV.  The cache key includes the file size and ``max_len``, so a truncated
     download can never be mistaken for a cached result.
+
+    ``L`` is identical for the train and the test split of a dataset, which is
+    required for the model to see the same tensor shape in training and at test
+    time.
     """
     root = Path(root or DATA_DIR)
     path = download_split(dataset, split, root, endpoint)
     size = path.stat().st_size
     cache_dir = root / "cache"
     cache_dir.mkdir(parents=True, exist_ok=True)
-    key = f"{dataset}_{split}_{size}_{max_len}"
-    cache = cache_dir / f"{key}.npz"
-    if use_cache and cache.exists():
-        z = np.load(cache)
-        return z["ids"], z["y"], dict(n=int(z["y"].size), length=int(z["ids"].shape[1]))
+
+    L = int(max_len) if max_len is not None else _pinned_max_len(dataset)
+    if L is not None:                                   # cache hit without parsing
+        cache = cache_dir / f"{dataset}_{split}_{size}_{L}.npz"
+        if use_cache and cache.exists():
+            z = np.load(cache)
+            return z["ids"], z["y"], dict(n=int(z["y"].size), length=int(z["ids"].shape[1]))
 
     df = _read_csv_gz(path)
     seqs = df["seq"].astype(str).tolist()
     y = df["label"].to_numpy().astype(np.float32)
     lengths = np.array([len(s) for s in seqs])
-    L = int(lengths.max()) if max_len is None else int(max_len)
+    if L is None:
+        L = _dataset_max_len(dataset, int(lengths.max()))
+    key = f"{dataset}_{split}_{size}_{L}"
+    cache = cache_dir / f"{key}.npz"
+    if use_cache and cache.exists():
+        z = np.load(cache)
+        return z["ids"], z["y"], dict(n=int(z["y"].size), length=int(z["ids"].shape[1]))
+
     ids = dna.seqs_to_ids(seqs, L)
-    if lengths.min() != lengths.max():
-        print(f"[data] WARNING variable lengths {lengths.min()}..{lengths.max()}, padded to {L}")
+    if int(lengths.max()) > L:
+        print(f"[data] WARNING {int(np.sum(lengths > L))} sequence(s) truncated to {L}")
+    elif lengths.min() != lengths.max():
+        print(f"[data] variable lengths {lengths.min()}..{lengths.max()}, padded to {L}")
     if use_cache:
         np.savez_compressed(cache, ids=ids, y=y)
     return ids, y, dict(n=int(y.size), length=L)

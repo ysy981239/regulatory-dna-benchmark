@@ -106,19 +106,21 @@ cd D:\kaggle\genomics
 | promoters | linear-2mer | 16 | group | 0.9000 | 0.8626 | 0.0930 |
 | promoters | transformer | 826k | group | 0.8564 | 0.8116 | 0.1322 |
 | promoters | linear-GC | 1 | group | 0.8394 | 0.7959 | 0.1125 |
-| drosophila | dilated | 930k | group | **0.8345** | 0.8841 | 0.3303 |
-| drosophila | basset | 476k | group | 0.8317 | 0.8691 | 0.2946 |
-| drosophila | basset | 476k | random | 0.8048 | 0.8470 | 0.2956 |
+| drosophila | basset | 476k | random | **0.8472** | 0.8760 | 0.1524 |
+| drosophila | dilated（修复前） | 930k | group | 0.8345 | 0.8841 | 0.3303 |
+| drosophila | basset | 476k | group | 0.8255 | 0.8748 | 0.1908 |
 | drosophila | linear-5mer | 1k | group | 0.7114 | 0.7427 | 0.1265 |
 | drosophila | linear-GC | 1 | group | 0.4722 | 0.5087 | 0.0172 |
+
+> drosophila 的 basset 两行是修掉 padding bug 之后重训重测的；dilated 重训约 4 h，故保留修复前那一行并标注。promoters 的窗口本来就没有 padding，不受这个 bug 影响，数字未变。前后对比见 [`docs/DEVLOG.md`](docs/DEVLOG.md)。
 
 **五条实测结论（前四条是负面的，这才是项目的价值所在）：**
 
 1. **官方 test split 自己就泄漏**：drosophila 有 **77.2%**、promoters 有 **54.8%** 的 test 序列与训练集共享 20-mer。所以无论怎么切 train/val，test 上的数字都会偏乐观。
 2. **随机划分把 val AUPRC 抬高 6–8 个点**（promoters basset 0.9663→0.9020，linear-5mer 0.9422→0.8652），而 test 上只差 0.036 / 0.025 —— 因为官方 test 本身就脏。
 3. **CNN 只比 1024 维 5-mer 线性模型高 1.5–2.3 个 AUPRC 点**，而 **GC 含量一个特征就能到 0.8394**。归因也印证了这点：学出的 PWM 共识是 `CCCCCCCC`、每列 0.3 bits、C+G 占 0.82 —— **是碱基组成，不是转录因子 motif**。transformer 在 27k 样本上训不动（0.8564，打不过线性 5-mer）。
-4. **打乱碱基顺序后，启动子模型还剩 86% 的 AUPRC，增强子模型只剩 58–64%**（`scripts/shuffle_probe.py`：每条 test 序列保留组成、洗掉顺序再打分）。promoters 0.9273 → 0.8005，drosophila 0.8317 → 0.5356（AUROC 落到 0.539 ≈ 抛硬币）。**启动子 CNN 主要是组成检测器，增强子 CNN 真的在用顺序。**
-5. **有两个正面发现**：drosophila 上 CNN 比 5-mer 高 12 点（0.8317 vs 0.7114，不过线性基线在该数据上欠定）；RC 增强让 AUPRC 掉 0.8 点却把 ECE 从 0.105 压到 **0.023**——**同一个改动可以伤指标、修校准**，只报 AUPRC 会把它误判为无效。
+4. **打乱碱基顺序后，启动子模型还剩 86% 的 AUPRC，增强子模型只剩 60%**（`scripts/shuffle_probe.py`：每条 test 序列保留组成、洗掉顺序再打分）。promoters 0.9275 → 0.7955，drosophila 0.8255 → 0.4976（已等于 0.50 的随机基线）。**启动子 CNN 主要是组成检测器，增强子 CNN 真的在用顺序。**
+5. **有两个正面发现**：drosophila 上 CNN 比 5-mer 高 11 点（0.8255 vs 0.7114，不过线性基线在该数据上欠定）；RC 增强让 AUPRC 掉 0.8 点却把 ECE 从 0.105 压到 **0.023**——**同一个改动可以伤指标、修校准**，只报 AUPRC 会把它误判为无效。
 
 ## 6. 目录结构
 
@@ -185,6 +187,9 @@ genomics/
 - **常值预测器的 AUROC 是「未定义」，不是 0.5**：sklearn 会返回 0.5 而不报错，务必自己判 `np.unique(p).size < 2`。
 - **ECE 不是 proper scoring rule**：温度缩放后 NLL 改善而 ECE 变差是正常的（promoters dilated：NLL 0.475→0.458，ECE 0.120→0.158）。模型的错是「自信地错」，没有任何全局单调变换能修。
 - **已经校准好的模型无法用温度缩放改善**：basset+RC 的 ECE 是 0.023，T=0.81≈恒等，校准后 0.021。这不是方法失败。
+- **padding 不是沉默的**：255 的 one-hot 是全零列，卷积输出 0，但 BatchNorm 会把 0 映射成一个非零常数；而全局 `mean‖max` 池化的分母是**补齐后的长度**。一条 236 bp 的增强子放进 3237 的张量，均值里 92.6% 来自那个常数。**这类 bug 不抛异常**，只在「同一份权重换一段代码、分数就变了」时才暴露。
+- **长度必须在 split 之间钉死**：`L` 曾按每个 split 各自取最大值 → train 3237、test 3061，同一个模型在训练和测试时算的不是同一个函数。现在注册表里写死 `max_len`。
+- **阈值不能在评估集上挑**：best-F1 的阈值曾在 test 预测上扫出来，报出去的是「看过 test 标签」的乐观值。现在阈值只在 val 上挑。
 - **`human_ocr_ensembl` 是最接近 DeepSEA 的任务，但也最容易被 composition 主导**——先跑实验 1，再决定要不要投入。
 - **`demo_human_or_worm` 几乎无信息量**（人 vs 线虫序列 trivially separable），只能当 pipeline 冒烟测试。
 - **不要用 `sklearn` 的 `train_test_split` 直接切基因组数据**，除非你明确想复现一个泄漏的基线。

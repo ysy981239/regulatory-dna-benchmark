@@ -11,12 +11,14 @@ No pretrained weights. Three models trained from scratch. Every claim below is a
 | # | Finding | Number |
 |---|---|---|
 | 1 | The public benchmark is itself contaminated: most official **test** sequences share a 20-mer with the training set | **77%** (Drosophila enhancers), **55%** (human promoters) |
-| 2 | A random row split overstates validation performance, i.e. it overstates *your own* result | **+6.4 AUPRC** (promoters), **+6.2** (Drosophila) |
+| 2 | A random row split overstates validation performance, i.e. it overstates *your own* result | **+6.4 AUPRC** (promoters), **+7.0** (Drosophila) |
 | 3 | A CNN beats a plain 5-mer logistic regression by almost nothing on promoters | **+0.9 to +2.3 AUPRC points** |
-| 4 | Destroy the base order, keep the base composition → most of the performance is still there | **86% retained** (promoters) vs **58–64%** (Drosophila enhancers) |
+| 4 | Destroy the base order, keep the base composition → most of the performance is still there | **86% retained** (promoters) vs **60%** (Drosophila enhancers) |
 | 5 | Attribution maps do not collapse onto a motif; they collapse onto GC enrichment | PWM consensus `CCCCCCCC`, **0.3 bits/column**, **C+G = 0.82** |
 
-Findings 1–5 are the reason the headline is a **negative** result on promoters. Finding 4 is also the reason the project is not entirely negative: on Drosophila enhancers the convolutional models **do** use sequence order (a CNN beats the 5-mer baseline by **+12 AUPRC points**, and 42% of its performance disappears when order is destroyed).
+Findings 1–5 are the reason the headline is a **negative** result on promoters. Finding 4 is also the reason the project is not entirely negative: on Drosophila enhancers the convolutional models **do** use sequence order (a CNN beats the 5-mer baseline by **+11 AUPRC points**, and 40% of its performance disappears when order is destroyed).
+
+Finding 4 and the padding numbers below were re-measured after the audit described in [docs/DEVLOG.md](docs/DEVLOG.md), which found that the global pooling layer was averaging over padding. The earlier Drosophila numbers (58–64% retained, +12 points, ECE up to 0.33) were produced by the buggy code path; the corrected values are the ones reported everywhere in this repository.
 
 ---
 
@@ -84,14 +86,16 @@ Main table (official test split, 95% bootstrap CI on AUPRC; `runs/` is gitignore
 | promoters | linear 2-mer | group | 0.9000 | 0.8626 | 0.093 |
 | promoters | transformer | group | 0.8564 | 0.8116 | 0.132 |
 | promoters | linear GC only | group | 0.8394 | 0.7959 | 0.113 |
-| Drosophila | dilated CNN | group | 0.8345 | 0.8841 | 0.330 |
-| Drosophila | basset | group | 0.8317 | 0.8691 | 0.295 |
-| Drosophila | basset | random | 0.8048 | 0.8470 | 0.296 |
+| Drosophila | basset | random | **0.8472** | 0.8760 | 0.152 |
+| Drosophila | dilated CNN (pre-fix) | group | 0.8345 | 0.8841 | 0.330 |
+| Drosophila | basset | group | 0.8255 | 0.8748 | 0.191 |
 | Drosophila | linear 5-mer | group | 0.7114 | 0.7427 | 0.127 |
 | Drosophila | linear 2-mer | group | 0.6367 | 0.6869 | 0.047 |
 | Drosophila | linear GC only | group | 0.4722 | 0.5087 | 0.017 |
 
 Read the promoters block top to bottom: the whole range from a GC-content counter (0.8394) to the best CNN (0.9408) is ~10 AUPRC points, and a linear model on 1,024 5-mer counts captures 0.9180 of it. That is the quantitative form of "this task is mostly composition".
+
+The two Drosophila Basset rows were retrained after the padding audit ([docs/DEVLOG.md](docs/DEVLOG.md) P1/P2); the dilated row is the older run and is annotated accordingly — its retraining costs ~4 h on a 6 GB laptop GPU and is left in the table so the before/after contrast stays visible. A padded-only bug cannot touch the promoter rows: those windows are a fixed 251 bp and contain no padding at all.
 
 ## Repository layout
 
@@ -110,8 +114,10 @@ scripts/
   shuffle_probe.py     destroy base order, keep base composition, re-score
   position_probe.py    circular-shift probe (destroys absolute position only)
   motif_analysis.py    IG x ISM agreement, PWM extraction, in-silico variant table
+  padding_check.py     padding fraction, length/prediction correlation, truncation cost
   make_table.py        aggregate runs/*/metrics.json into reports/summary.md
-tests/test_core.py     8 assertions covering the parts where a silent bug would invert a conclusion
+tests/test_core.py     9 assertions covering the parts where a silent bug would invert a conclusion
+docs/DEVLOG.md         the 14 bugs found after the pipeline already "worked"
 ```
 
 ## Documents

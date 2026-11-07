@@ -1,0 +1,252 @@
+{
+  "seed": 0,
+  "shift": [
+    {
+      "run": "drosophila_enhancers_stark__basset__group__s0",
+      "dataset": "drosophila_enhancers_stark",
+      "model": "basset",
+      "split": "group",
+      "n_seqs": 1730,
+      "real": {
+        "auprc": 0.8255,
+        "auroc": 0.8748
+      },
+      "shifted": {
+        "auprc": 0.6389,
+        "auroc": 0.682
+      },
+      "retained_auprc_frac": 0.7739551786795882,
+      "corr": 0.37887777392453936
+    },
+    {
+      "run": "drosophila_enhancers_stark__basset__random__s0",
+      "dataset": "drosophila_enhancers_stark",
+      "model": "basset",
+      "split": "random",
+      "n_seqs": 1730,
+      "real": {
+        "auprc": 0.8472,
+        "auroc": 0.876
+      },
+      "shifted": {
+        "auprc": 0.6223,
+        "auroc": 0.6567
+      },
+      "retained_auprc_frac": 0.734537299338999,
+      "corr": 0.3586937125211148
+    },
+    {
+      "run": "human_nontata_promoters__basset-norc__group__s0",
+      "dataset": "human_nontata_promoters",
+      "model": "basset",
+      "split": "group",
+      "n_seqs": 9034,
+      "real": {
+        "auprc": 0.9359,
+        "auroc": 0.9095
+      },
+      "shifted": {
+        "auprc": 0.9151,
+        "auroc": 0.8781
+      },
+      "retained_auprc_frac": 0.9777754033550594,
+      "corr": 0.8835228912017414
+    },
+    {
+      "run": "human_nontata_promoters__basset__group__s0",
+      "dataset": "human_nontata_promoters",
+      "model": "basset",
+      "split": "group",
+      "n_seqs": 9034,
+      "real": {
+        "auprc": 0.9275,
+        "auroc": 0.8935
+      },
+      "shifted": {
+        "auprc": 0.9202,
+        "auroc": 0.8829
+      },
+      "retained_auprc_frac": 0.9921293800539084,
+      "corr": 0.9643175206731205
+    },
+    {
+      "run": "human_nontata_promoters__basset__random__s0",
+      "dataset": "human_nontata_promoters",
+      "model": "basset",
+      "split": "random",
+      "n_seqs": 9034,
+      "real": {
+        "auprc": 0.9638,
+        "auroc": 0.9487
+      },
+      "shifted": {
+        "auprc": 0.9514,
+        "auroc": 0.9303
+      },
+      "retained_auprc_frac": 0.9871342602199626,
+      "corr": 0.8499499974576381
+    },
+    {
+      "run": "human_nontata_promoters__dilated__group__s0",
+      "dataset": "human_nontata_promoters",
+      "model": "dilated",
+      "split": "group",
+      "n_seqs": 9034,
+      "real": {
+        "auprc": 0.9408,
+        "auroc": 0.9173
+      },
+      "shifted": {
+        "auprc": 0.938,
+        "auroc": 0.9129
+      },
+      "retained_auprc_frac": 0.9970238095238095,
+      "corr": 0.9800430722623967
+    },
+    {
+      "run": "human_nontata_promoters__transformer__group__s0",
+      "dataset": "human_nontata_promoters",
+      "model": "transformer",
+      "split": "group",
+      "n_seqs": 9034,
+      "real": {
+        "auprc": 0.8564,
+        "auroc": 0.8116
+      },
+      "shifted": {
+        "auprc": 0.8098,
+        "auroc": 0.748
+      },
+      "retained_auprc_frac": 0.9455861746847267,
+      "corr": 0.7145388721961584
+    }
+  ],
+  "kmers": {
+    "dataset": "human_nontata_promoters",
+    "n_kmers_kept": 3860,
+    "class_median": 0.3724882684117566,
+    "null_median": 0.32912649547991724,
+    "null_p99": 0.6465368534973797,
+    "n_above_null_p99": 109,
+    "frac_above_null_p99": 0.028238341968911916,
+    "top": [
+      {
+        "kmer": "ACGATC",
+        "D": 0.7590566925429293,
+        "peak_pos": 19,
+        "n_pos": 109,
+        "n_neg": 156
+      },
+      {
+        "kmer": "TTCGAC",
+        "D": 0.7562926370265806,
+        "peak_pos": 200,
+        "n_pos": 156,
+        "n_neg": 109
+      },
+      {
+        "kmer": "TACCGA",
+        "D": 0.7544351073762827,
+        "peak_pos": 217,
+        "n_pos": 126,
+        "n_neg": 102
+      },
+      {
+        "kmer": "TTACCG",
+        "D": 0.744669190912714,
+        "peak_pos": 240,
+        "n_pos": 193,
+        "n_neg": 104
+      },
+      {
+        "kmer": "CGTACA",
+        "D": 0.7446672808447313,
+        "peak_pos": 83,
+        "n_pos": 137,
+        "n_neg": 103
+      },
+      {
+        "kmer": "GCGTAT",
+        "D": 0.7392533936651569,
+        "peak_pos": 38,
+        "n_pos": 136,
+        "n_neg": 104
+      },
+      {
+        "kmer": "GACGAT",
+        "D": 0.7356640769515348,
+        "peak_pos": 67,
+        "n_pos": 159,
+        "n_neg": 102
+      },
+      {
+        "kmer": "CTATAC",
+        "D": 0.7354080987029424,
+        "peak_pos": 5,
+        "n_pos": 109,
+        "n_neg": 232
+      },
+      {
+        "kmer": "TACGGT",
+        "D": 0.7349282296650702,
+        "peak_pos": 24,
+        "n_pos": 152,
+        "n_neg": 110
+      },
+      {
+        "kmer": "TCGTAA",
+        "D": 0.7338247338247332,
+        "peak_pos": 87,
+        "n_pos": 111,
+        "n_neg": 132
+      },
+      {
+        "kmer": "CCGTAA",
+        "D": 0.7269984917043726,
+        "peak_pos": 45,
+        "n_pos": 221,
+        "n_neg": 102
+      },
+      {
+        "kmer": "TATCGC",
+        "D": 0.724422442244225,
+        "peak_pos": 154,
+        "n_pos": 150,
+        "n_neg": 101
+      }
+    ],
+    "canonical": {
+      "TATAAA": {
+        "D": 0.3772409858328715,
+        "peak_pos": 7,
+        "n_pos": 419,
+        "n_neg": 1188
+      },
+      "TATATA": {
+        "D": 0.41238046463165856,
+        "peak_pos": 17,
+        "n_pos": 436,
+        "n_neg": 1039
+      },
+      "CCAATC": {
+        "D": 0.4638560678055727,
+        "peak_pos": 151,
+        "n_pos": 1123,
+        "n_neg": 357
+      },
+      "GGGCGG": {
+        "D": 0.3089667063930411,
+        "peak_pos": 156,
+        "n_pos": 11082,
+        "n_neg": 646
+      },
+      "CACGTC": {
+        "D": 0.4875837603468662,
+        "peak_pos": 102,
+        "n_pos": 531,
+        "n_neg": 258
+      }
+    }
+  },
+  "note": "shifted = circular roll of the real bases only: composition preserved, absolute position destroyed"
+}

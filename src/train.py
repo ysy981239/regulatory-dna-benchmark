@@ -176,6 +176,17 @@ def main(argv=None):
     ids_tr, y_tr, meta = gdata.load_split(args.dataset, "train", max_len=args.max_len)
     ids_te, y_te, _ = gdata.load_split(args.dataset, "test", max_len=args.max_len)
     L = meta["length"]
+    # The model must see the same tensor width in training and at test time.
+    # ``load_split`` already guarantees this for datasets with a pinned length
+    # (see docs/DEVLOG.md, issue P2); this is the defensive fallback.
+    if ids_te.shape[1] < L:
+        print(f"[data] padding test {ids_te.shape[1]} -> {L}")
+        ids_te = np.concatenate(
+            [ids_te, np.full((ids_te.shape[0], L - ids_te.shape[1]), 255, dtype=ids_te.dtype)],
+            axis=1)
+    elif ids_te.shape[1] > L:
+        print(f"[data] WARNING truncating test {ids_te.shape[1]} -> {L}")
+        ids_te = ids_te[:, :L]
 
     if args.split == "group":
         clusters = gdata.homology_clusters(ids_tr, k=args.kmer_k)
@@ -193,6 +204,9 @@ def main(argv=None):
         kw["width"] = args.width
     model = gmodels.build_model(args.model, L, **kw).to(device)
     print(f"[model] {gmodels.describe(model)}  input_len={L}")
+    pad_frac = float((ids_tr == 255).mean())
+    print(f"[data] {pad_frac:.1%} of the train tensor is padding "
+          f"(excluded from pooling and attention; see docs/DEVLOG.md P1)")
 
     train_loader = build_loaders(ids_tr[tr_idx], y_tr[tr_idx], args.batch_size,
                                  args.rc_augment, args.num_workers, args.seed, shuffle=True)
@@ -279,8 +293,15 @@ def main(argv=None):
         raise RuntimeError("training produced no checkpoint")
     model.load_state_dict(best["state"])
 
+    # the decision threshold has to come from the validation split: tuning it on
+    # the same predictions it is reported on would make the F1 optimistic by
+    # construction (docs/DEVLOG.md, issue E3)
+    yv, pv = predict(model, val_loader, device)
+    thr = ev.best_f1_threshold(yv, pv)
+
     yt, pt = predict(model, test_loader, device)
-    test_metrics = ev.binary_metrics(yt, pt, n_boot=200, seed=args.seed)
+    test_metrics = ev.binary_metrics(yt, pt, n_boot=200, seed=args.seed,
+                                     given_threshold=thr)
     result = {
         "dataset": args.dataset,
         "model": args.model,
@@ -291,6 +312,7 @@ def main(argv=None):
         "leakage": leak,
         "best_epoch": best["epoch"],
         "best_val_auprc": best["auprc"],
+        "val_best_f1_threshold": round(thr, 4),
         "test": test_metrics,
         "wall_clock_s": round(time.time() - t0, 1),
         "rc_augment": args.rc_augment,

@@ -122,6 +122,41 @@ def test_registry():
     assert gdata.split_url("x", "train").endswith("/v1/x/x_train.csv.gz")
 
 
+def test_padding_invariance():
+    """The score of a sequence must not depend on how much padding follows it.
+
+    Regression for docs/DEVLOG.md P1: with plain ``h.mean(-1)`` the denominator
+    was the padded length, so the *same* enhancer received a different score
+    inside a 3237 bp tensor than inside the 3061 bp test tensor.  BatchNorm is
+    close to identity right after initialisation, which is exactly what makes
+    this test sharp: even the old mean-pooling bug shows up.
+    """
+    import torch
+    from src import models as gm
+
+    torch.manual_seed(0)
+    n_real, n_long = 120, 520
+    x = torch.zeros(2, 4, n_real)
+    idx = torch.randint(0, 4, (2, n_real))
+    x.scatter_(1, idx.unsqueeze(1), 1.0)
+    short = torch.cat([x, torch.zeros(2, 4, 40)], dim=-1)              # 160 wide
+    long_ = torch.cat([x, torch.zeros(2, 4, n_long - n_real)], dim=-1)  # 520 wide
+
+    for cls in (gm.Basset, gm.DilatedCNN):
+        model = cls(n_long).eval()
+        with torch.no_grad():
+            a, b = model(short), model(long_)
+        assert torch.isfinite(a).all() and torch.isfinite(b).all()
+        assert torch.allclose(a, b, atol=1e-3), (
+            f"{cls.__name__}: score depends on trailing padding "
+            f"({a.tolist()} vs {b.tolist()})")
+
+    # the mask itself must follow the same pooling as the features
+    m = gm.valid_mask(short)
+    assert m.dtype == torch.bool and m.shape == (2, 1, short.shape[-1])
+    assert int(m.sum()) == 2 * n_real
+
+
 def test_receptive_field():
     # Hand computation for Basset's 15/5 · 9/4 · 9/4 stack, counting the pooling
     # windows: 1 +14 +4 +8*5 +3*5 +8*20 +3*20 = 294.  Cross-checked by

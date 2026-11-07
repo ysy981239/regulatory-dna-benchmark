@@ -18,6 +18,47 @@ import torch
 import torch.nn as nn
 
 
+def valid_mask(x: torch.Tensor) -> torch.Tensor:
+    """``(B, 1, L)`` bool: True where the position carries a real base.
+
+    One-hot encodes a real base as exactly one 1, while padding (id 255) and an
+    ambiguous ``N`` (also 255) both become an all-zero column.  So "sum over the
+    base axis > 0.5" is exactly the "is there information at this position" test.
+    """
+    return x.sum(dim=1, keepdim=True) > 0.5
+
+
+def down_mask(mask: torch.Tensor, blk: "ConvBlock") -> torch.Tensor:
+    """Push the validity mask through the same pooling the features went through.
+
+    Max-pooling on the mask ("does this window still contain one real base?")
+    rather than mean-pooling: a window that is half padding is still usable, and
+    a mean would silently down-weight it.
+    """
+    if isinstance(blk.pool, nn.MaxPool1d):
+        return blk.pool(mask.to(torch.float32)) > 0.5
+    return mask
+
+
+def masked_pool(h: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
+    """``mean || max`` over the *valid* positions only -> ``(B, 2C)``.
+
+    Why this exists (see docs/DEVLOG.md, issue P1): the padded columns are
+    all-zero one-hot, so the first conv sees 0 there, but BatchNorm then maps
+    that 0 to a non-zero constant gamma*beta.  With plain ``h.mean(-1)`` the
+    denominator is the padded length, so a 236 bp enhancer in a 3237 bp tensor
+    would draw ~93% of its mean from that constant.  The representation would
+    then depend on raw sequence length instead of on the sequence.
+    """
+    m = mask.to(h.dtype)
+    mean = (h * m).sum(dim=-1) / m.sum(dim=-1).clamp(min=1.0)
+    fill = torch.finfo(h.dtype).min
+    hmax = h.masked_fill(~mask, fill).amax(dim=-1)
+    keep = mask.any(dim=-1)                       # (B, 1); empty window -> 0
+    hmax = torch.where(keep, hmax, torch.zeros_like(hmax))
+    return torch.cat([mean, hmax], dim=-1)
+
+
 class ConvBlock(nn.Module):
     def __init__(self, cin: int, cout: int, k: int, pool: int, dropout: float = 0.0):
         super().__init__()
@@ -52,9 +93,12 @@ class Basset(nn.Module):
         )
 
     def forward(self, x):
-        h = self.features(x)
-        h = torch.cat([h.mean(dim=-1), h.amax(dim=-1)], dim=1)
-        return self.head(h).squeeze(-1)
+        mask = valid_mask(x)                      # (B, 1, L)
+        h = x
+        for blk in self.features:
+            h = blk(h)
+            mask = down_mask(mask, blk)           # keep it in step with pooling
+        return self.head(masked_pool(h, mask)).squeeze(-1)
 
     def receptive_field(self) -> int:
         """Width of the input window that one final feature is computed from.
@@ -112,11 +156,11 @@ class DilatedCNN(nn.Module):
         )
 
     def forward(self, x):
+        mask = valid_mask(x)                      # dilated stack never pools
         h = self.stem(x)
         for blk in self.blocks:
             h = blk(h)
-        h = torch.cat([h.mean(dim=-1), h.amax(dim=-1)], dim=1)
-        return self.head(h).squeeze(-1)
+        return self.head(masked_pool(h, mask)).squeeze(-1)
 
     def receptive_field(self) -> int:
         rf = 11
@@ -154,10 +198,13 @@ class DNATransformer(nn.Module):
         self.head = nn.Linear(2 * d_model, 1)   # mean || max pooling
 
     def forward(self, x):
-        h = self.proj(x.transpose(1, 2))          # (B, L, d)
-        h = self.encoder(self.pos(h))
+        mask = valid_mask(x)                                  # (B, 1, L)
+        h = self.proj(x.transpose(1, 2))                       # (B, L, d)
+        # padded columns must not be attended to, otherwise every real base
+        # mixes in information from the zero-padding region
+        h = self.encoder(self.pos(h), src_key_padding_mask=~mask[:, 0, :])
         h = self.norm(h)
-        pooled = torch.cat([h.mean(dim=1), h.amax(dim=1)], dim=1)
+        pooled = masked_pool(h.transpose(1, 2), mask)          # (B, 2d)
         return self.head(pooled).squeeze(-1)
 
     def receptive_field(self) -> int:

@@ -71,7 +71,28 @@ def ece(y: np.ndarray, p: np.ndarray, n_bins: int = 15) -> float:
     return float(total)
 
 
-def binary_metrics(y, p, threshold: float = 0.5, n_boot: int = 200, seed: int = 0) -> dict:
+def best_f1_threshold(y, p) -> float:
+    """Threshold that maximises F1 **on the data it is computed from**.
+
+    This is an oracle: applied to the same split it was tuned on, it is an upper
+    bound, not an honest test statistic.  Tune it on validation and pass it to
+    ``binary_metrics(..., given_threshold=...)`` (see docs/DEVLOG.md, issue E3).
+    """
+    y = np.asarray(y, float)
+    p = np.asarray(p, float)
+    order = np.argsort(-p)
+    ys = y[order]
+    ps = p[order]
+    tp = np.cumsum(ys)
+    fp = np.cumsum(1 - ys)
+    prec = tp / np.clip(tp + fp, 1, None)
+    rec = tp / max(ys.sum(), 1)
+    f1 = 2 * prec * rec / np.clip(prec + rec, 1e-9, None)
+    return float(ps[int(np.argmax(f1))])
+
+
+def binary_metrics(y, p, threshold: float = 0.5, n_boot: int = 200, seed: int = 0,
+                   given_threshold: float | None = None) -> dict:
     from sklearn.metrics import (average_precision_score, brier_score_loss, f1_score,
                                  precision_score, recall_score, roc_auc_score)
 
@@ -99,25 +120,21 @@ def binary_metrics(y, p, threshold: float = 0.5, n_boot: int = 200, seed: int = 
             out["auprc_ci95"] = [round(float(np.percentile(vals, 2.5)), 4),
                                  round(float(np.percentile(vals, 97.5)), 4)]
 
-    # best-F1 threshold, reported with the threshold so it is reproducible
-    order = np.argsort(-p)
-    ys = y[order]
-    ps = p[order]
-    tp = np.cumsum(ys)
-    fp = np.cumsum(1 - ys)
-    prec = tp / np.clip(tp + fp, 1, None)
-    rec = tp / max(ys.sum(), 1)
-    f1 = 2 * prec * rec / np.clip(prec + rec, 1e-9, None)
-    k = int(np.argmax(f1))
-    out["best_f1"] = round(float(f1[k]), 4)
-    out["best_f1_threshold"] = round(float(ps[k]), 4)
+    # best-F1 threshold on *this* split - kept for reproducibility, but it is an
+    # oracle: reporting it as a test number is optimistic by construction
+    out["best_f1_threshold"] = round(best_f1_threshold(y, p), 4)
 
-    for name, thr in (("at_0.5", 0.5), ("at_best_f1", out["best_f1_threshold"])):
+    named = [("at_0.5", 0.5), ("at_best_f1", out["best_f1_threshold"])]
+    if given_threshold is not None:
+        out["given_threshold"] = round(float(given_threshold), 4)
+        named.append(("at_given", float(given_threshold)))
+    for name, thr in named:
         pred = (p >= thr).astype(int)
         out[f"precision_{name}"] = round(float(precision_score(y, pred, zero_division=0)), 4)
         out[f"recall_{name}"] = round(float(recall_score(y, pred, zero_division=0)), 4)
         out[f"f1_{name}"] = round(float(f1_score(y, pred, zero_division=0)), 4)
         out[f"specificity_{name}"] = round(float(recall_score(1 - y, 1 - pred, zero_division=0)), 4)
+    out["best_f1"] = out["f1_at_best_f1"]
     return out
 
 

@@ -4,230 +4,230 @@
   "n_seqs": 32,
   "sanity": {
     "top_k": 161,
-    "jaccard_ig_vs_ism": 0.0676,
-    "mean_peak_concentration": 0.0082
+    "jaccard_ig_vs_ism": 0.1621,
+    "mean_peak_concentration": 0.0064
   },
   "pwm": {
     "width": 8,
     "n_sites": 100,
-    "n_skipped_windows": 0,
+    "n_skipped_windows": 4,
     "consensus": "AAAAAAAA",
     "consensus_from": "ACGT",
     "probabilities": [
       [
-        0.318,
+        0.317,
+        0.217,
+        0.192,
+        0.273
+      ],
+      [
+        0.321,
+        0.217,
+        0.187,
+        0.275
+      ],
+      [
+        0.316,
+        0.215,
+        0.188,
+        0.28
+      ],
+      [
+        0.317,
+        0.214,
+        0.186,
+        0.284
+      ],
+      [
+        0.317,
+        0.214,
+        0.187,
+        0.281
+      ],
+      [
+        0.324,
         0.207,
-        0.209,
-        0.266
+        0.194,
+        0.275
       ],
       [
-        0.304,
-        0.212,
+        0.324,
         0.205,
-        0.279
-      ],
-      [
-        0.304,
-        0.213,
-        0.195,
-        0.288
-      ],
-      [
-        0.301,
-        0.218,
-        0.193,
-        0.288
+        0.191,
+        0.28
       ],
       [
         0.318,
-        0.209,
-        0.2,
-        0.272
-      ],
-      [
-        0.315,
-        0.202,
-        0.203,
-        0.279
-      ],
-      [
-        0.308,
-        0.216,
-        0.201,
-        0.276
-      ],
-      [
-        0.305,
-        0.199,
-        0.198,
-        0.298
+        0.208,
+        0.189,
+        0.285
       ]
     ],
     "bits_per_column": [
-      0.02,
-      0.02,
-      0.03,
-      0.02,
       0.03,
       0.03,
-      0.02,
+      0.03,
+      0.03,
+      0.03,
+      0.03,
+      0.03,
       0.03
     ],
-    "gc_share": 0.41,
+    "gc_share": 0.402,
     "mean_bits": 0.03
   },
   "top_kmers": [
     {
       "kmer": "AAAAAA",
-      "count": 31
+      "count": 20
     },
     {
       "kmer": "TTTTTT",
+      "count": 20
+    },
+    {
+      "kmer": "TTTAAT",
       "count": 17
     },
     {
-      "kmer": "ATTTTT",
+      "kmer": "TGTGTG",
       "count": 16
     },
     {
-      "kmer": "AAATAA",
+      "kmer": "AAATAT",
       "count": 16
+    },
+    {
+      "kmer": "AAAAAT",
+      "count": 14
+    },
+    {
+      "kmer": "TATATA",
+      "count": 14
+    },
+    {
+      "kmer": "AGAAAA",
+      "count": 14
+    },
+    {
+      "kmer": "TATTTA",
+      "count": 14
     },
     {
       "kmer": "GAAAAA",
-      "count": 15
+      "count": 13
     },
     {
-      "kmer": "AAAATA",
-      "count": 15
-    },
-    {
-      "kmer": "TTATTT",
-      "count": 14
+      "kmer": "ATTTAA",
+      "count": 12
     },
     {
       "kmer": "TTTTTA",
-      "count": 14
-    },
-    {
-      "kmer": "CACACA",
-      "count": 14
-    },
-    {
-      "kmer": "TTTTGC",
-      "count": 13
-    },
-    {
-      "kmer": "ATAAAT",
-      "count": 13
-    },
-    {
-      "kmer": "TTTTAT",
-      "count": 13
-    },
-    {
-      "kmer": "TTTATT",
-      "count": 13
-    },
-    {
-      "kmer": "ATAATA",
       "count": 12
     },
     {
-      "kmer": "TATAAA",
-      "count": 12
+      "kmer": "ATATAT",
+      "count": 11
+    },
+    {
+      "kmer": "ATAAAA",
+      "count": 11
+    },
+    {
+      "kmer": "GAAAAT",
+      "count": 11
     }
   ],
   "variants": [
     {
-      "seq_index": 10,
-      "position": 21,
-      "ref": "A",
-      "alt": "C",
-      "delta_logit": 0.2463,
-      "delta_prob": 0.007547,
-      "context": "GAGATTCAAGAT[A>C]CAAGATTTTAGT"
-    },
-    {
-      "seq_index": 10,
-      "position": 2,
-      "ref": "A",
-      "alt": "C",
-      "delta_logit": 0.2411,
-      "delta_prob": 0.007406,
-      "context": "GG[A>C]GGATGTGAGATT"
-    },
-    {
-      "seq_index": 10,
-      "position": 10,
-      "ref": "A",
-      "alt": "C",
-      "delta_logit": 0.2411,
-      "delta_prob": 0.007406,
-      "context": "GGAGGATGTG[A>C]GATTCAAGATAC"
-    },
-    {
-      "seq_index": 10,
-      "position": 16,
+      "seq_index": 22,
+      "position": 0,
       "ref": "A",
       "alt": "G",
-      "delta_logit": 0.2407,
-      "delta_prob": 0.007393,
-      "context": "GATGTGAGATTC[A>G]AGATACAAGATT"
+      "delta_logit": 0.3607,
+      "delta_prob": 0.014528,
+      "context": "[A>G]AAGGCGAGGCAA"
     },
     {
-      "seq_index": 10,
-      "position": 14,
+      "seq_index": 24,
+      "position": 8,
+      "ref": "A",
+      "alt": "C",
+      "delta_logit": 0.3295,
+      "delta_prob": 0.013901,
+      "context": "CAGCGTCC[A>C]ACAAGCTGAAAC"
+    },
+    {
+      "seq_index": 13,
+      "position": 11,
+      "ref": "A",
+      "alt": "C",
+      "delta_logit": 0.3221,
+      "delta_prob": 0.011002,
+      "context": "GCGTCTCCAAC[A>C]CAACACAGGACA"
+    },
+    {
+      "seq_index": 29,
+      "position": 5,
+      "ref": "A",
+      "alt": "G",
+      "delta_logit": 0.3141,
+      "delta_prob": 0.014331,
+      "context": "GCGCA[A>G]GACACACACAAA"
+    },
+    {
+      "seq_index": 23,
+      "position": 7,
+      "ref": "T",
+      "alt": "G",
+      "delta_logit": 0.3092,
+      "delta_prob": 0.012888,
+      "context": "GGTAATC[T>G]AGCCTCTATTTG"
+    },
+    {
+      "seq_index": 24,
+      "position": 5,
       "ref": "T",
       "alt": "C",
-      "delta_logit": 0.2355,
-      "delta_prob": 0.00725,
-      "context": "AGGATGTGAGAT[T>C]CAAGATACAAGA"
+      "delta_logit": 0.3007,
+      "delta_prob": 0.012846,
+      "context": "CAGCG[T>C]CCAACAAGCTGA"
     },
     {
-      "seq_index": 10,
-      "position": 21,
-      "ref": "A",
+      "seq_index": 23,
+      "position": 14,
+      "ref": "T",
       "alt": "G",
-      "delta_logit": 0.2333,
-      "delta_prob": 0.00719,
-      "context": "GAGATTCAAGAT[A>G]CAAGATTTTAGT"
+      "delta_logit": 0.2908,
+      "delta_prob": 0.012216,
+      "context": "TAATCTAGCCTC[T>G]ATTTGCCACCCC"
     },
     {
-      "seq_index": 10,
-      "position": 24,
-      "ref": "A",
+      "seq_index": 24,
+      "position": 5,
+      "ref": "T",
       "alt": "G",
-      "delta_logit": 0.2319,
-      "delta_prob": 0.007152,
-      "context": "ATTCAAGATACA[A>G]GATTTTAGTTGA"
+      "delta_logit": 0.2893,
+      "delta_prob": 0.012421,
+      "context": "CAGCG[T>G]CCAACAAGCTGA"
     },
     {
-      "seq_index": 10,
-      "position": 17,
+      "seq_index": 13,
+      "position": 16,
       "ref": "A",
       "alt": "C",
-      "delta_logit": 0.2318,
-      "delta_prob": 0.00715,
-      "context": "ATGTGAGATTCA[A>C]GATACAAGATTT"
+      "delta_logit": 0.2825,
+      "delta_prob": 0.00982,
+      "context": "CTCCAACACAAC[A>C]CAGGACATAAAT"
     },
     {
-      "seq_index": 10,
-      "position": 12,
-      "ref": "A",
-      "alt": "G",
-      "delta_logit": 0.2314,
-      "delta_prob": 0.007138,
-      "context": "GGAGGATGTGAG[A>G]TTCAAGATACAA"
-    },
-    {
-      "seq_index": 10,
+      "seq_index": 17,
       "position": 19,
-      "ref": "A",
-      "alt": "G",
-      "delta_logit": 0.2305,
-      "delta_prob": 0.007113,
-      "context": "GTGAGATTCAAG[A>G]TACAAGATTTTA"
+      "ref": "T",
+      "alt": "C",
+      "delta_logit": 0.2803,
+      "delta_prob": 0.010569,
+      "context": "GAGGAAGGGGTC[T>C]TGATAATAGTGT"
     }
   ],
   "verdict": "IG and ISM disagree - at least one is describing noise; do not claim a motif",

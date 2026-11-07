@@ -1,0 +1,67 @@
+{
+  "records": [
+    {
+      "run": "drosophila_enhancers_stark__basset__group__s0",
+      "dataset": "drosophila_enhancers_stark",
+      "model": "basset",
+      "split": "group",
+      "tensor_len": 3237,
+      "padding_fraction": 0.3439293858403824,
+      "real_len": {
+        "min": 258,
+        "q25": 2103.0,
+        "median": 2143.0,
+        "mean": 2123.700578034682,
+        "q75": 2201.0,
+        "max": 3061
+      },
+      "auprc_full": 0.8179,
+      "spearman_len_vs_pred": 0.02505838039487463,
+      "spearman_len_vs_abspred": 0.02505838039487463,
+      "by_quintile": [
+        {
+          "quintile": 1,
+          "n": 346,
+          "mean_real_len": 1858.057803468208,
+          "pos_frac": 0.5,
+          "auprc": 0.8037
+        },
+        {
+          "quintile": 2,
+          "n": 346,
+          "mean_real_len": 2110.1098265895953,
+          "pos_frac": 0.5,
+          "auprc": 0.828
+        },
+        {
+          "quintile": 3,
+          "n": 346,
+          "mean_real_len": 2143.421965317919,
+          "pos_frac": 0.5,
+          "auprc": 0.866
+        },
+        {
+          "quintile": 4,
+          "n": 346,
+          "mean_real_len": 2189.4797687861274,
+          "pos_frac": 0.5,
+          "auprc": 0.8114
+        },
+        {
+          "quintile": 5,
+          "n": 346,
+          "mean_real_len": 2317.433526011561,
+          "pos_frac": 0.5,
+          "auprc": 0.7909
+        }
+      ],
+      "trunc": {
+        "keep": 500,
+        "auprc": 0.7274,
+        "delta_auprc": -0.09049999999999991,
+        "corr_with_full": 0.7257522976287937
+      }
+    }
+  ],
+  "note": "padding is excluded from pooling and attention since the P1 fix; a large spearman(length, prediction) would mean padding still dilutes the score"
+}

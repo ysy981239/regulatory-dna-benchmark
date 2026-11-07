@@ -1,6 +1,8 @@
 .venv/
 data/
 runs/
+runs_legacy/
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
+tests/_*.log
