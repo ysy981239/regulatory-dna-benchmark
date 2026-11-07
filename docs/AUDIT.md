@@ -86,7 +86,7 @@ homology.
 | first version | `8548ec9` | the pipeline ran, produced plausible numbers, and was wrong in ways listed above |
 | padding audit | `674b6e1` | P1/P2/E3 fixed, Drosophila retrained, probes re-measured |
 | threshold audit | `0a4107f` | `k` swept and stress-tested; the leak figure restated as a range, not a point |
-| split audit | `SPLIT_COMMIT` | the validation set stopped depending on a shuffle (E5); size now equals the request at every threshold |
+| split audit | `3b7dec6` | the validation set stopped depending on a shuffle (E5); size now equals the request at every threshold |
 
 ---
 
