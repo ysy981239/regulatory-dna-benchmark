@@ -9,6 +9,10 @@ right.
 
 `ID` is stable and referenced from the code comments (`see docs/DEVLOG.md P1`).
 
+For the one-page version — three detectors, and the number each failure moved —
+see [AUDIT.md](AUDIT.md).  This file is the long form: root cause, fix and
+verification for every entry.
+
 | ID | Area | Symptom in one line | Severity | Found by |
 |---|---|---|---|---|
 | P2 | data | train and test tensors had different widths (3237 vs 3061) | high | asking "what does padding do" |
@@ -256,6 +260,16 @@ so the file was rebuilt from scratch.  Policy since then: non-ASCII files are
 only touched by tools that read and write UTF-8 explicitly.
 
 ---
+
+## Timeline
+
+| stage | commit | what became true |
+|---|---|---|
+| first version | `8548ec9` | the pipeline ran end to end and produced plausible numbers — and was wrong in all the ways above |
+| padding audit | `674b6e1` | P1 / P2 / E3 fixed (masked pooling, one tensor width, threshold on validation); Drosophila retrained; every probe re-measured on the fixed weights |
+| threshold audit | `0a4107f` | `k` swept and stress-tested against sequence complexity; the leak figure restated as a range (59–77%) instead of a point |
+
+The point of this table is that the first row is where a normal project stops.
 
 ## What this list is actually evidence of
 
