@@ -1,0 +1,62 @@
+{
+  "dataset": "drosophila_enhancers_stark",
+  "k": 20,
+  "sweep": [
+    {
+      "min_entropy_bits": 0.0,
+      "n_clusters": 1309,
+      "largest": 3723,
+      "largest_frac": 0.7182,
+      "singletons": 1189,
+      "edges": 18401,
+      "train_rows": 4406,
+      "val_rows": 778,
+      "val_clusters": 703,
+      "test_sharing_full_train": 1336,
+      "frac_test_sharing": 0.7723,
+      "val_sharing_with_train": 0
+    },
+    {
+      "min_entropy_bits": 1.2,
+      "n_clusters": 1844,
+      "largest": 3054,
+      "largest_frac": 0.5891,
+      "singletons": 1638,
+      "edges": 13355,
+      "train_rows": 4406,
+      "val_rows": 778,
+      "val_clusters": 691,
+      "test_sharing_full_train": 1205,
+      "frac_test_sharing": 0.6965,
+      "val_sharing_with_train": 0
+    },
+    {
+      "min_entropy_bits": 1.5,
+      "n_clusters": 2506,
+      "largest": 2099,
+      "largest_frac": 0.4049,
+      "singletons": 2129,
+      "edges": 10151,
+      "train_rows": 4406,
+      "val_rows": 778,
+      "val_clusters": 641,
+      "test_sharing_full_train": 1030,
+      "frac_test_sharing": 0.5954,
+      "val_sharing_with_train": 0
+    },
+    {
+      "min_entropy_bits": 1.7,
+      "n_clusters": 3049,
+      "largest": 1371,
+      "largest_frac": 0.2645,
+      "singletons": 2556,
+      "edges": 8734,
+      "train_rows": 4406,
+      "val_rows": 778,
+      "val_clusters": 631,
+      "test_sharing_full_train": 885,
+      "frac_test_sharing": 0.5116,
+      "val_sharing_with_train": 0
+    }
+  ]
+}

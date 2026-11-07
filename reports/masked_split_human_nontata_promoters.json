@@ -1,0 +1,62 @@
+{
+  "dataset": "human_nontata_promoters",
+  "k": 20,
+  "sweep": [
+    {
+      "min_entropy_bits": 0.0,
+      "n_clusters": 12254,
+      "largest": 8307,
+      "largest_frac": 0.3066,
+      "singletons": 11378,
+      "edges": 44753,
+      "train_rows": 23032,
+      "val_rows": 4065,
+      "val_clusters": 2930,
+      "test_sharing_full_train": 5225,
+      "frac_test_sharing": 0.5784,
+      "val_sharing_with_train": 0
+    },
+    {
+      "min_entropy_bits": 1.2,
+      "n_clusters": 13705,
+      "largest": 6283,
+      "largest_frac": 0.2319,
+      "singletons": 12727,
+      "edges": 50051,
+      "train_rows": 23032,
+      "val_rows": 4065,
+      "val_clusters": 3027,
+      "test_sharing_full_train": 4770,
+      "frac_test_sharing": 0.528,
+      "val_sharing_with_train": 0
+    },
+    {
+      "min_entropy_bits": 1.5,
+      "n_clusters": 14344,
+      "largest": 5933,
+      "largest_frac": 0.219,
+      "singletons": 13558,
+      "edges": 62275,
+      "train_rows": 23032,
+      "val_rows": 4065,
+      "val_clusters": 2815,
+      "test_sharing_full_train": 4510,
+      "frac_test_sharing": 0.4992,
+      "val_sharing_with_train": 0
+    },
+    {
+      "min_entropy_bits": 1.7,
+      "n_clusters": 14499,
+      "largest": 5744,
+      "largest_frac": 0.212,
+      "singletons": 13764,
+      "edges": 64305,
+      "train_rows": 23032,
+      "val_rows": 4065,
+      "val_clusters": 2923,
+      "test_sharing_full_train": 4418,
+      "frac_test_sharing": 0.489,
+      "val_sharing_with_train": 0
+    }
+  ]
+}

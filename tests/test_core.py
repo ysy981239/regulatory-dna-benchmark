@@ -157,6 +157,38 @@ def test_padding_invariance():
     assert int(m.sum()) == 2 * n_real
 
 
+def test_grouped_split_size_is_stable():
+    """A dominant family must not decide how big the validation set is.
+
+    Regression for docs/DEVLOG.md E5: the old loop walked clusters in shuffled
+    order and stopped at the first crossing, so whichever side the blob landed
+    on set the size.  On the real data that gave val = 34.6% of the rows where
+    15% was asked for, which changes early stopping, the fitted temperature and
+    therefore every calibration number in the report.
+    """
+    n = 300
+    clusters = np.concatenate([np.zeros(120, dtype=int), np.arange(1, 181)])
+    y = np.tile([0, 1], n // 2)
+
+    for seed in range(8):
+        train_idx, val_idx = gdata.grouped_split(y, clusters, val_frac=0.15, seed=seed)
+        assert len(train_idx) + len(val_idx) == n
+        # no family may be split across the two sides
+        assert len(set(clusters[train_idx]) & set(clusters[val_idx])) == 0
+        # the 120-row blob is larger than the budget, so it can never be val
+        assert 0 not in set(clusters[val_idx])
+        # 15% of 300 = 45, and every available family is a singleton
+        assert len(val_idx) == 45, f"seed {seed}: val has {len(val_idx)} rows"
+
+    # a single cluster is still an error, not a silent 100% validation set
+    try:
+        gdata.grouped_split(y, np.zeros(n, dtype=int), val_frac=0.15, seed=0)
+    except RuntimeError:
+        pass
+    else:
+        raise AssertionError("one-cluster input must raise, not split arbitrarily")
+
+
 def test_receptive_field():
     # Hand computation for Basset's 15/5 · 9/4 · 9/4 stack, counting the pooling
     # windows: 1 +14 +4 +8*5 +3*5 +8*20 +3*20 = 294.  Cross-checked by

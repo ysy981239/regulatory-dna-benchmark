@@ -5,7 +5,7 @@ problems below were found**.  That is the interesting part: a pipeline that runs
 is not a pipeline that is correct, and for a project whose entire output is a
 number, the only way to trust the number is to attack it.
 
-This page is the short version — three detectors, fifteen failures, and what each
+This page is the short version — three detectors, sixteen failures, and what each
 one changed.  The long version, with root causes and verification, is in
 [DEVLOG.md](DEVLOG.md).
 
@@ -56,7 +56,7 @@ homology.
 
 ---
 
-## Fifteen failures, and the number each one moved
+## Sixteen failures, and the number each one moved
 
 | ID | what was wrong | what it changed |
 |---|---|---|
@@ -66,6 +66,7 @@ homology.
 | E2 | the leak audit measured its own sentinel bug | leak **99.9% → 77.2%** (enhancers) / **54.8%** (promoters) |
 | E3 | the reported F1 used a threshold tuned on the test predictions | best F1 **0.83 (oracle) → val-tuned**, 1–3 points lower |
 | E4 | the `k = 20` "same family" threshold was never validated | leak **77.2% → 59.5%** after removing low-complexity k-mers |
+| E5 | the size of the validation set was decided by the shuffle | val **34.6% → 15.0%** of the rows (promoters), **778 → 778** rows but 3.5× spread removed (Drosophila) |
 | T1 | the LR schedule was defined in steps but stepped per epoch | LR reached **29% of `--lr`** → full 5e-4 → 1e-3 → 0 |
 | T2 | `LambdaLR` construction evaluated `lr_lambda(0)` | epoch 1 ran at **lr = 0** → 5e-4 |
 | T3 | early stopping fired during the warmup plateau | runs ended at **epoch 19/30** → full schedule |
@@ -85,6 +86,7 @@ homology.
 | first version | `8548ec9` | the pipeline ran, produced plausible numbers, and was wrong in ways listed above |
 | padding audit | `674b6e1` | P1/P2/E3 fixed, Drosophila retrained, probes re-measured |
 | threshold audit | `0a4107f` | `k` swept and stress-tested; the leak figure restated as a range, not a point |
+| split audit | `SPLIT_COMMIT` | the validation set stopped depending on a shuffle (E5); size now equals the request at every threshold |
 
 ---
 

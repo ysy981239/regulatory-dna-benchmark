@@ -21,6 +21,7 @@ verification for every entry.
 | E2 | clustering | the leak audit reported 99.9% test/train overlap for *every* split, including the homologous one (which had 0 by construction) | high | the two numbers contradicted each other |
 | E3 | metrics | the reported F1 used a threshold tuned on the same predictions it was scored on | medium | writing the DEVLOG, asking "what would a reviewer attack" |
 | E4 | clustering | the k=20 "same family" threshold was never validated, and the giant component turns out to be chained by low-complexity repeats | high | asking "does the grouped split actually do anything" |
+| E5 | clustering | the size of the validation set was decided by the shuffle: promoters ran with 34.6% val where 15% was asked for | high | sweeping the entropy threshold, then wondering why val moved |
 | T1 | schedule | the LR never left the linear warmup: cosine annealing never happened | high | reading the LR trace, not the loss |
 | T2 | schedule | epoch 1 trained at lr = 0 | medium | same trace |
 | T3 | training | early stopping fired during the warmup plateau and cut the annealed tail | medium | run ended at epoch 19 of 30 |
@@ -160,6 +161,48 @@ No single k-mer dominates — the component is chained through *many* weak links
 **Side finding.** `reports/leakage_*.json` reports 54.8% for promoters because `leakage_report` subsamples train to 20,000 rows; the full 27,097-row pool gives 57.8%. The published number is a slight *under*-estimate, which is the harmless direction.
 
 **Lesson.** Any constant that carries a conclusion needs (a) a sweep showing where the conclusion breaks and (b) a mechanism test showing *why* the grouping happened. Both were one script away and neither was written until the split's value was challenged.
+
+## E5 — the size of the validation set was decided by a shuffle
+
+**Symptom.** `grouped_split` walked clusters in shuffled order and stopped at the
+first crossing of the target size. With one dominant cluster, whether that
+cluster landed before or after the crossing changed the validation set
+completely. Measured on the real data (`scripts/masked_split.py`):
+
+| dataset | asked for | actually got | spread over thresholds |
+|---|---|---|---|
+| drosophila | 778 | 778 / 778 / **2,731** / 778 | 3.5× |
+| promoters | 4,065 | **9,384** / 6,381 / 6,199 / 4,065 | 2.3× |
+
+The promoter runs therefore never had the 15% validation set the command line
+requested — they had **34.6%**. Nothing raised, and the val curves looked fine,
+because a bigger validation set is not visibly broken, just different.
+
+**Why it matters.** Validation size is not cosmetic: it sets the resolution of
+early stopping, of the fitted temperature, of every calibration number, and of
+the reported bootstrap-free val AUPRC that the baseline comparison used.
+
+**Fix.** Two rules, no new dependency (`src/data.py`): a cluster larger than the
+target may never enter validation (it would eat the whole budget), and a cluster
+is skipped if adding it would overshoot by more than 15%. After the fix both
+datasets land on the requested size at every entropy threshold — 778 and 4,065
+exactly, across 0.0 / 1.2 / 1.5 / 1.7 bits.
+
+**Verification.** `tests/test_core.py::test_grouped_split_size_is_stable` builds
+300 rows with one 120-row blob, sweeps 8 seeds, and asserts val is exactly 45
+rows, that the blob never enters val, and that no family is split. On the old
+code the same test fails for every seed where the blob is drawn first.
+
+**Limitation this exposes rather than fixes.** Validation is now a random draw of
+*small* families, not a random sample of families: any cluster bigger than 15% of
+the data can never be validated on at all. That is a property of the protocol,
+not of the function, and it means grouped-split numbers measure "generalisation
+to unseen small families" — a weaker claim than "unseen families".
+
+**Prospective, not retroactive.** The `group` rows in the results tables were
+produced by the old split. Re-running them changes val selection, hence early
+stopping and the threshold, so the numbers would move slightly; they have not
+been regenerated and the report says so.
 
 ## T1 / T2 / T3 — the learning-rate schedule was never executed
 

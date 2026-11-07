@@ -260,23 +260,53 @@ def homology_clusters(ids: np.ndarray, k: int = 20) -> np.ndarray:
 
 
 def grouped_split(y: np.ndarray, clusters: np.ndarray, val_frac: float = 0.15,
-                  seed: int = 0):
-    """Split whole clusters, not rows, so no homolog spans train and validation."""
-    rng = np.random.default_rng(seed)
-    uniq = np.unique(clusters)
-    rng.shuffle(uniq)
-    target = int(round(val_frac * len(y)))
-    val_clusters, n_val = [], 0
-    for c in uniq:
-        if n_val >= target:
-            break
-        val_clusters.append(c)
-        n_val += int(np.sum(clusters == c))
-    if not val_clusters:  # pathological: one giant cluster
+                  seed: int = 0, max_overshoot: float = 0.15):
+    """Split whole clusters, not rows, so no homolog spans train and validation.
+
+    Two rules keep the size of the validation set from being decided by chance:
+
+    1. a cluster larger than the target cannot enter validation at all -- one
+       such blob would take the whole budget and leave train nearly empty;
+    2. a cluster is skipped when adding it would overshoot the target by more
+       than ``max_overshoot``.
+
+    Without these, the size of the dominant cluster decided whether val ended up
+    with 15% or 35% of the rows (see docs/DEVLOG.md E5): identical data, same
+    seed, only the shuffle order differed.
+
+    The seed still chooses *which* small families go to validation -- so val is
+    a random draw of small families, not a random sample of all families, and
+    that bias is a limitation of the protocol rather than of this function.
+    """
+    n = len(y)
+    target = max(int(round(val_frac * n)), 1)
+    uniq, counts = np.unique(clusters, return_counts=True)
+    if uniq.size == 1:  # pathological: one giant cluster
         raise RuntimeError(
             "homology clustering produced a single cluster - the dataset is one "
             "family; lower --kmer-k or use a random split deliberately"
         )
+
+    rng = np.random.default_rng(seed)
+    cap = target * (1.0 + max_overshoot)
+    large = counts > target  # cannot be validated on without destroying the split
+
+    order = rng.permutation(uniq.size)
+    val_clusters, n_val = [], 0
+    for i in order:
+        c, size = int(uniq[i]), int(counts[i])
+        if n_val >= target:
+            break
+        if large[i]:
+            continue
+        if n_val and n_val + size > cap:
+            continue  # keep the budget; this cluster goes to train instead
+        val_clusters.append(c)
+        n_val += size
+
+    if not val_clusters:  # every cluster is large: fall back to the smallest one
+        val_clusters = [int(uniq[int(np.argmin(counts))])]
+
     mask = np.isin(clusters, np.array(val_clusters))
     return np.where(~mask)[0], np.where(mask)[0]
 
