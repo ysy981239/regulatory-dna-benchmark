@@ -1,0 +1,9 @@
+# PyTorch is expected to be provided by the existing conda env (torch 2.5.1 / cu121).
+# If you need to install it yourself, match your driver:
+#   pip install torch --index-url https://download.pytorch.org/whl/cu121
+numpy>=1.26
+pandas>=2.1
+scipy>=1.11
+scikit-learn>=1.4
+matplotlib>=3.8
+pyyaml>=6.0

@@ -1,0 +1,63 @@
+{
+  "dataset": "human_nontata_promoters",
+  "length": 251,
+  "train": {
+    "n": 27097,
+    "n_pos": 14742,
+    "n_neg": 12355,
+    "pos_frac": 0.544
+  },
+  "test": {
+    "n": 9034,
+    "n_pos": 4915,
+    "n_neg": 4119,
+    "pos_frac": 0.5441
+  },
+  "baselines": [
+    {
+      "baseline": "GC content only",
+      "n_features": 1,
+      "auroc": 0.7959,
+      "auprc": 0.8394,
+      "ece": 0.0558
+    },
+    {
+      "baseline": "dinucleotide freq (16)",
+      "n_features": 16,
+      "auroc": 0.8629,
+      "auprc": 0.9011,
+      "ece": 0.0217
+    },
+    {
+      "baseline": "5-mer freq (1024)",
+      "n_features": 1024,
+      "auroc": 0.9178,
+      "auprc": 0.9446,
+      "ece": 0.0313
+    }
+  ],
+  "near_duplication": {
+    "kmer_k": 20,
+    "probed": 2000,
+    "frac_test_sharing_a_kmer_with_train": 0.548
+  },
+  "homology_clusters": {
+    "k": 20,
+    "n_clusters": 12254,
+    "mean_cluster_size": 2.21
+  },
+  "split_leakage": {
+    "random_row_split": {
+      "shared_homology_clusters": 434,
+      "val_rows_sharing_a_kmer_with_train": 0.557,
+      "kmer_k": 20,
+      "probed": 2000
+    },
+    "homology_grouped_split": {
+      "shared_homology_clusters": 0,
+      "val_rows_sharing_a_kmer_with_train": 0.0,
+      "kmer_k": 20,
+      "probed": 2000
+    }
+  }
+}

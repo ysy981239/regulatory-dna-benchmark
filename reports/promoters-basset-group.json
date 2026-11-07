@@ -1,0 +1,239 @@
+{
+  "run": "human_nontata_promoters__basset__group__s0",
+  "dataset": "human_nontata_promoters",
+  "n_seqs": 64,
+  "sanity": {
+    "top_k": 12,
+    "jaccard_ig_vs_ism": 0.266,
+    "mean_peak_concentration": 0.018
+  },
+  "pwm": {
+    "width": 8,
+    "n_sites": 100,
+    "n_skipped_windows": 0,
+    "consensus": "CCCCCCCC",
+    "consensus_from": "ACGT",
+    "probabilities": [
+      [
+        0.087,
+        0.418,
+        0.401,
+        0.094
+      ],
+      [
+        0.089,
+        0.419,
+        0.397,
+        0.095
+      ],
+      [
+        0.091,
+        0.415,
+        0.401,
+        0.094
+      ],
+      [
+        0.089,
+        0.415,
+        0.403,
+        0.093
+      ],
+      [
+        0.089,
+        0.416,
+        0.402,
+        0.093
+      ],
+      [
+        0.09,
+        0.413,
+        0.403,
+        0.094
+      ],
+      [
+        0.09,
+        0.416,
+        0.402,
+        0.092
+      ],
+      [
+        0.089,
+        0.419,
+        0.401,
+        0.092
+      ]
+    ],
+    "bits_per_column": [
+      0.32,
+      0.31,
+      0.31,
+      0.32,
+      0.32,
+      0.31,
+      0.32,
+      0.32
+    ],
+    "gc_share": 0.818,
+    "mean_bits": 0.32
+  },
+  "top_kmers": [
+    {
+      "kmer": "GCGGCG",
+      "count": 156
+    },
+    {
+      "kmer": "GGCGGC",
+      "count": 144
+    },
+    {
+      "kmer": "CGGCGG",
+      "count": 130
+    },
+    {
+      "kmer": "CCCGCC",
+      "count": 125
+    },
+    {
+      "kmer": "GGGCGG",
+      "count": 119
+    },
+    {
+      "kmer": "CGCCGC",
+      "count": 116
+    },
+    {
+      "kmer": "CCGCCC",
+      "count": 115
+    },
+    {
+      "kmer": "GCGCGC",
+      "count": 113
+    },
+    {
+      "kmer": "GGCGGG",
+      "count": 111
+    },
+    {
+      "kmer": "GGGGCG",
+      "count": 105
+    },
+    {
+      "kmer": "CGCCCC",
+      "count": 101
+    },
+    {
+      "kmer": "GCCGCC",
+      "count": 100
+    },
+    {
+      "kmer": "CCGCCG",
+      "count": 98
+    },
+    {
+      "kmer": "GCGGGG",
+      "count": 97
+    },
+    {
+      "kmer": "CCCCGC",
+      "count": 96
+    }
+  ],
+  "variants": [
+    {
+      "seq_index": 34,
+      "position": 137,
+      "ref": "A",
+      "alt": "G",
+      "delta_logit": 1.358,
+      "delta_prob": 6e-06,
+      "context": "TGAGTGACGGCC[A>G]TGCGGACCAATG"
+    },
+    {
+      "seq_index": 34,
+      "position": 145,
+      "ref": "C",
+      "alt": "T",
+      "delta_logit": 1.2509,
+      "delta_prob": 6e-06,
+      "context": "GGCCATGCGGAC[C>T]AATGGGGCGGGC"
+    },
+    {
+      "seq_index": 50,
+      "position": 97,
+      "ref": "A",
+      "alt": "C",
+      "delta_logit": 1.2404,
+      "delta_prob": 7e-06,
+      "context": "CCCCTCCCCCCG[A>C]GCCTCACCTTTT"
+    },
+    {
+      "seq_index": 33,
+      "position": 140,
+      "ref": "G",
+      "alt": "T",
+      "delta_logit": 1.2397,
+      "delta_prob": 6e-06,
+      "context": "CGGGCGGCCAAT[G>T]AGGGCGGCCGGA"
+    },
+    {
+      "seq_index": 40,
+      "position": 138,
+      "ref": "G",
+      "alt": "C",
+      "delta_logit": 1.2274,
+      "delta_prob": 6e-06,
+      "context": "TCGCTCGCGCCG[G>C]GCCCCGCGGCCG"
+    },
+    {
+      "seq_index": 31,
+      "position": 130,
+      "ref": "T",
+      "alt": "G",
+      "delta_logit": 1.1885,
+      "delta_prob": 5e-06,
+      "context": "GCGGCCTCGGGC[T>G]CGCGCGCAAAGG"
+    },
+    {
+      "seq_index": 43,
+      "position": 163,
+      "ref": "T",
+      "alt": "C",
+      "delta_logit": 1.1456,
+      "delta_prob": 6e-06,
+      "context": "AAAGTCCCGCGG[T>C]GGCGGCGGCGGC"
+    },
+    {
+      "seq_index": 34,
+      "position": 139,
+      "ref": "G",
+      "alt": "T",
+      "delta_logit": 1.1446,
+      "delta_prob": 6e-06,
+      "context": "AGTGACGGCCAT[G>T]CGGACCAATGGG"
+    },
+    {
+      "seq_index": 47,
+      "position": 183,
+      "ref": "T",
+      "alt": "C",
+      "delta_logit": 1.1319,
+      "delta_prob": 7e-06,
+      "context": "CGCGCGGCGCGG[T>C]GCACGCTGGGAT"
+    },
+    {
+      "seq_index": 48,
+      "position": 159,
+      "ref": "T",
+      "alt": "C",
+      "delta_logit": 1.1198,
+      "delta_prob": 7e-06,
+      "context": "TCCCCTCCCCCC[T>C]GCCCAGAAAGAC"
+    }
+  ],
+  "verdict": "IG and ISM disagree - at least one is describing noise; do not claim a motif",
+  "ism_window": [
+    0,
+    251
+  ],
+  "figure": "D:\\kaggle\\genomics\\reports\\promoters-basset-group.png"
+}

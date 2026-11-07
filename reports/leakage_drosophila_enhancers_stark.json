@@ -1,0 +1,63 @@
+{
+  "dataset": "drosophila_enhancers_stark",
+  "length": 3237,
+  "train": {
+    "n": 5184,
+    "n_pos": 2592,
+    "n_neg": 2592,
+    "pos_frac": 0.5
+  },
+  "test": {
+    "n": 1730,
+    "n_pos": 865,
+    "n_neg": 865,
+    "pos_frac": 0.5
+  },
+  "baselines": [
+    {
+      "baseline": "GC content only",
+      "n_features": 1,
+      "auroc": 0.5087,
+      "auprc": 0.4722,
+      "ece": 0.0805
+    },
+    {
+      "baseline": "dinucleotide freq (16)",
+      "n_features": 16,
+      "auroc": 0.6873,
+      "auprc": 0.6372,
+      "ece": 0.0542
+    },
+    {
+      "baseline": "5-mer freq (1024)",
+      "n_features": 1024,
+      "auroc": 0.7478,
+      "auprc": 0.7144,
+      "ece": 0.0992
+    }
+  ],
+  "near_duplication": {
+    "kmer_k": 20,
+    "probed": 1730,
+    "frac_test_sharing_a_kmer_with_train": 0.7723
+  },
+  "homology_clusters": {
+    "k": 20,
+    "n_clusters": 1309,
+    "mean_cluster_size": 3.96
+  },
+  "split_leakage": {
+    "random_row_split": {
+      "shared_homology_clusters": 42,
+      "val_rows_sharing_a_kmer_with_train": 0.7545,
+      "kmer_k": 20,
+      "probed": 778
+    },
+    "homology_grouped_split": {
+      "shared_homology_clusters": 0,
+      "val_rows_sharing_a_kmer_with_train": 0.0,
+      "kmer_k": 20,
+      "probed": 778
+    }
+  }
+}

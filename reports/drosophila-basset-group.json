@@ -1,0 +1,239 @@
+{
+  "run": "drosophila_enhancers_stark__basset__group__s0",
+  "dataset": "drosophila_enhancers_stark",
+  "n_seqs": 32,
+  "sanity": {
+    "top_k": 161,
+    "jaccard_ig_vs_ism": 0.0676,
+    "mean_peak_concentration": 0.0082
+  },
+  "pwm": {
+    "width": 8,
+    "n_sites": 100,
+    "n_skipped_windows": 0,
+    "consensus": "AAAAAAAA",
+    "consensus_from": "ACGT",
+    "probabilities": [
+      [
+        0.318,
+        0.207,
+        0.209,
+        0.266
+      ],
+      [
+        0.304,
+        0.212,
+        0.205,
+        0.279
+      ],
+      [
+        0.304,
+        0.213,
+        0.195,
+        0.288
+      ],
+      [
+        0.301,
+        0.218,
+        0.193,
+        0.288
+      ],
+      [
+        0.318,
+        0.209,
+        0.2,
+        0.272
+      ],
+      [
+        0.315,
+        0.202,
+        0.203,
+        0.279
+      ],
+      [
+        0.308,
+        0.216,
+        0.201,
+        0.276
+      ],
+      [
+        0.305,
+        0.199,
+        0.198,
+        0.298
+      ]
+    ],
+    "bits_per_column": [
+      0.02,
+      0.02,
+      0.03,
+      0.02,
+      0.03,
+      0.03,
+      0.02,
+      0.03
+    ],
+    "gc_share": 0.41,
+    "mean_bits": 0.03
+  },
+  "top_kmers": [
+    {
+      "kmer": "AAAAAA",
+      "count": 31
+    },
+    {
+      "kmer": "TTTTTT",
+      "count": 17
+    },
+    {
+      "kmer": "ATTTTT",
+      "count": 16
+    },
+    {
+      "kmer": "AAATAA",
+      "count": 16
+    },
+    {
+      "kmer": "GAAAAA",
+      "count": 15
+    },
+    {
+      "kmer": "AAAATA",
+      "count": 15
+    },
+    {
+      "kmer": "TTATTT",
+      "count": 14
+    },
+    {
+      "kmer": "TTTTTA",
+      "count": 14
+    },
+    {
+      "kmer": "CACACA",
+      "count": 14
+    },
+    {
+      "kmer": "TTTTGC",
+      "count": 13
+    },
+    {
+      "kmer": "ATAAAT",
+      "count": 13
+    },
+    {
+      "kmer": "TTTTAT",
+      "count": 13
+    },
+    {
+      "kmer": "TTTATT",
+      "count": 13
+    },
+    {
+      "kmer": "ATAATA",
+      "count": 12
+    },
+    {
+      "kmer": "TATAAA",
+      "count": 12
+    }
+  ],
+  "variants": [
+    {
+      "seq_index": 10,
+      "position": 21,
+      "ref": "A",
+      "alt": "C",
+      "delta_logit": 0.2463,
+      "delta_prob": 0.007547,
+      "context": "GAGATTCAAGAT[A>C]CAAGATTTTAGT"
+    },
+    {
+      "seq_index": 10,
+      "position": 2,
+      "ref": "A",
+      "alt": "C",
+      "delta_logit": 0.2411,
+      "delta_prob": 0.007406,
+      "context": "GG[A>C]GGATGTGAGATT"
+    },
+    {
+      "seq_index": 10,
+      "position": 10,
+      "ref": "A",
+      "alt": "C",
+      "delta_logit": 0.2411,
+      "delta_prob": 0.007406,
+      "context": "GGAGGATGTG[A>C]GATTCAAGATAC"
+    },
+    {
+      "seq_index": 10,
+      "position": 16,
+      "ref": "A",
+      "alt": "G",
+      "delta_logit": 0.2407,
+      "delta_prob": 0.007393,
+      "context": "GATGTGAGATTC[A>G]AGATACAAGATT"
+    },
+    {
+      "seq_index": 10,
+      "position": 14,
+      "ref": "T",
+      "alt": "C",
+      "delta_logit": 0.2355,
+      "delta_prob": 0.00725,
+      "context": "AGGATGTGAGAT[T>C]CAAGATACAAGA"
+    },
+    {
+      "seq_index": 10,
+      "position": 21,
+      "ref": "A",
+      "alt": "G",
+      "delta_logit": 0.2333,
+      "delta_prob": 0.00719,
+      "context": "GAGATTCAAGAT[A>G]CAAGATTTTAGT"
+    },
+    {
+      "seq_index": 10,
+      "position": 24,
+      "ref": "A",
+      "alt": "G",
+      "delta_logit": 0.2319,
+      "delta_prob": 0.007152,
+      "context": "ATTCAAGATACA[A>G]GATTTTAGTTGA"
+    },
+    {
+      "seq_index": 10,
+      "position": 17,
+      "ref": "A",
+      "alt": "C",
+      "delta_logit": 0.2318,
+      "delta_prob": 0.00715,
+      "context": "ATGTGAGATTCA[A>C]GATACAAGATTT"
+    },
+    {
+      "seq_index": 10,
+      "position": 12,
+      "ref": "A",
+      "alt": "G",
+      "delta_logit": 0.2314,
+      "delta_prob": 0.007138,
+      "context": "GGAGGATGTGAG[A>G]TTCAAGATACAA"
+    },
+    {
+      "seq_index": 10,
+      "position": 19,
+      "ref": "A",
+      "alt": "G",
+      "delta_logit": 0.2305,
+      "delta_prob": 0.007113,
+      "context": "GTGAGATTCAAG[A>G]TACAAGATTTTA"
+    }
+  ],
+  "verdict": "IG and ISM disagree - at least one is describing noise; do not claim a motif",
+  "ism_window": [
+    0,
+    256
+  ],
+  "figure": "D:\\kaggle\\genomics\\reports\\drosophila-basset-group.png"
+}

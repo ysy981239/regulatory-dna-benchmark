@@ -1,0 +1,158 @@
+{
+  "seed": 0,
+  "records": [
+    {
+      "run": "drosophila_enhancers_stark__basset__group__s0",
+      "dataset": "drosophila_enhancers_stark",
+      "model": "basset",
+      "split": "group",
+      "n_seqs": 1730,
+      "real": {
+        "auprc": 0.8317,
+        "auroc": 0.8691
+      },
+      "shuffled": {
+        "auprc": 0.5356,
+        "auroc": 0.5388
+      },
+      "drop_auprc": 0.29610000000000003,
+      "drop_auroc": 0.33030000000000004,
+      "retained_auprc_frac": 0.6439822051220392,
+      "pred_corr": 0.037124455643406294
+    },
+    {
+      "run": "drosophila_enhancers_stark__basset__random__s0",
+      "dataset": "drosophila_enhancers_stark",
+      "model": "basset",
+      "split": "random",
+      "n_seqs": 1730,
+      "real": {
+        "auprc": 0.8048,
+        "auroc": 0.847
+      },
+      "shuffled": {
+        "auprc": 0.4811,
+        "auroc": 0.4957
+      },
+      "drop_auprc": 0.32369999999999993,
+      "drop_auroc": 0.3513,
+      "retained_auprc_frac": 0.5977882703777336,
+      "pred_corr": 0.0814366024597688
+    },
+    {
+      "run": "drosophila_enhancers_stark__dilated__group__s0",
+      "dataset": "drosophila_enhancers_stark",
+      "model": "dilated",
+      "split": "group",
+      "n_seqs": 1730,
+      "real": {
+        "auprc": 0.8345,
+        "auroc": 0.8841
+      },
+      "shuffled": {
+        "auprc": 0.4853,
+        "auroc": 0.4847
+      },
+      "drop_auprc": 0.3492,
+      "drop_auroc": 0.3994,
+      "retained_auprc_frac": 0.5815458358298382,
+      "pred_corr": 0.0363283306586735
+    },
+    {
+      "run": "human_nontata_promoters__basset-norc__group__s0",
+      "dataset": "human_nontata_promoters",
+      "model": "basset",
+      "split": "group",
+      "n_seqs": 3000,
+      "real": {
+        "auprc": 0.9347,
+        "auroc": 0.9039
+      },
+      "shuffled": {
+        "auprc": 0.8156,
+        "auroc": 0.7683
+      },
+      "drop_auprc": 0.11909999999999998,
+      "drop_auroc": 0.13560000000000005,
+      "retained_auprc_frac": 0.8725794372525945,
+      "pred_corr": 0.5924889232793488
+    },
+    {
+      "run": "human_nontata_promoters__basset__group__s0",
+      "dataset": "human_nontata_promoters",
+      "model": "basset",
+      "split": "group",
+      "n_seqs": 3000,
+      "real": {
+        "auprc": 0.9273,
+        "auroc": 0.8902
+      },
+      "shuffled": {
+        "auprc": 0.8005,
+        "auroc": 0.7538
+      },
+      "drop_auprc": 0.12680000000000002,
+      "drop_auroc": 0.13639999999999997,
+      "retained_auprc_frac": 0.8632589237571444,
+      "pred_corr": 0.571843646926249
+    },
+    {
+      "run": "human_nontata_promoters__basset__random__s0",
+      "dataset": "human_nontata_promoters",
+      "model": "basset",
+      "split": "random",
+      "n_seqs": 3000,
+      "real": {
+        "auprc": 0.9652,
+        "auroc": 0.9499
+      },
+      "shuffled": {
+        "auprc": 0.7295,
+        "auroc": 0.7033
+      },
+      "drop_auprc": 0.2356999999999999,
+      "drop_auroc": 0.24659999999999993,
+      "retained_auprc_frac": 0.7558019063406549,
+      "pred_corr": 0.3805015270802192
+    },
+    {
+      "run": "human_nontata_promoters__dilated__group__s0",
+      "dataset": "human_nontata_promoters",
+      "model": "dilated",
+      "split": "group",
+      "n_seqs": 3000,
+      "real": {
+        "auprc": 0.9397,
+        "auroc": 0.9112
+      },
+      "shuffled": {
+        "auprc": 0.8091,
+        "auroc": 0.7675
+      },
+      "drop_auprc": 0.13059999999999994,
+      "drop_auroc": 0.14370000000000005,
+      "retained_auprc_frac": 0.8610194743003087,
+      "pred_corr": 0.38169465523105467
+    },
+    {
+      "run": "human_nontata_promoters__transformer__group__s0",
+      "dataset": "human_nontata_promoters",
+      "model": "transformer",
+      "split": "group",
+      "n_seqs": 3000,
+      "real": {
+        "auprc": 0.8589,
+        "auroc": 0.8075
+      },
+      "shuffled": {
+        "auprc": 0.8103,
+        "auroc": 0.7384
+      },
+      "drop_auprc": 0.04859999999999998,
+      "drop_auroc": 0.06910000000000005,
+      "retained_auprc_frac": 0.9434159972057283,
+      "pred_corr": 0.7051163795605416
+    }
+  ],
+  "note": "shuffled = per-sequence base permutation: composition preserved, order destroyed"
+}

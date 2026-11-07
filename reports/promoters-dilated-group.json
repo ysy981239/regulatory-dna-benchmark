@@ -1,0 +1,239 @@
+{
+  "run": "human_nontata_promoters__dilated__group__s0",
+  "dataset": "human_nontata_promoters",
+  "n_seqs": 64,
+  "sanity": {
+    "top_k": 12,
+    "jaccard_ig_vs_ism": 0.381,
+    "mean_peak_concentration": 0.0232
+  },
+  "pwm": {
+    "width": 8,
+    "n_sites": 100,
+    "n_skipped_windows": 0,
+    "consensus": "GGGGGGGG",
+    "consensus_from": "ACGT",
+    "probabilities": [
+      [
+        0.111,
+        0.378,
+        0.391,
+        0.12
+      ],
+      [
+        0.11,
+        0.378,
+        0.389,
+        0.123
+      ],
+      [
+        0.108,
+        0.382,
+        0.388,
+        0.122
+      ],
+      [
+        0.11,
+        0.382,
+        0.389,
+        0.119
+      ],
+      [
+        0.109,
+        0.375,
+        0.395,
+        0.121
+      ],
+      [
+        0.108,
+        0.381,
+        0.391,
+        0.12
+      ],
+      [
+        0.108,
+        0.385,
+        0.386,
+        0.121
+      ],
+      [
+        0.115,
+        0.374,
+        0.39,
+        0.121
+      ]
+    ],
+    "bits_per_column": [
+      0.22,
+      0.22,
+      0.22,
+      0.22,
+      0.22,
+      0.23,
+      0.22,
+      0.21
+    ],
+    "gc_share": 0.769,
+    "mean_bits": 0.22
+  },
+  "top_kmers": [
+    {
+      "kmer": "GGGCGG",
+      "count": 93
+    },
+    {
+      "kmer": "CCGCCC",
+      "count": 74
+    },
+    {
+      "kmer": "CGCCCC",
+      "count": 74
+    },
+    {
+      "kmer": "CCCCGC",
+      "count": 73
+    },
+    {
+      "kmer": "GGCGGG",
+      "count": 73
+    },
+    {
+      "kmer": "GCGGGG",
+      "count": 72
+    },
+    {
+      "kmer": "CGGGGC",
+      "count": 69
+    },
+    {
+      "kmer": "CCCGCC",
+      "count": 68
+    },
+    {
+      "kmer": "GGCGGC",
+      "count": 67
+    },
+    {
+      "kmer": "GGGGCG",
+      "count": 66
+    },
+    {
+      "kmer": "CGCCGC",
+      "count": 66
+    },
+    {
+      "kmer": "GCGGCG",
+      "count": 63
+    },
+    {
+      "kmer": "GCCGCC",
+      "count": 61
+    },
+    {
+      "kmer": "CCGCCG",
+      "count": 59
+    },
+    {
+      "kmer": "GCGCGG",
+      "count": 55
+    }
+  ],
+  "variants": [
+    {
+      "seq_index": 57,
+      "position": 112,
+      "ref": "T",
+      "alt": "G",
+      "delta_logit": 10.0188,
+      "delta_prob": 0.0,
+      "context": "GCTCGCGGGGGC[T>G]GAGGCGAGAGGA"
+    },
+    {
+      "seq_index": 10,
+      "position": 121,
+      "ref": "A",
+      "alt": "C",
+      "delta_logit": 9.3086,
+      "delta_prob": 0.0,
+      "context": "CGCGCCCGCCTC[A>C]GCGCCCCCACTC"
+    },
+    {
+      "seq_index": 10,
+      "position": 183,
+      "ref": "A",
+      "alt": "C",
+      "delta_logit": 9.1771,
+      "delta_prob": 0.0,
+      "context": "CGCCGCCGCCGC[A>C]GCGCCCTCAGGC"
+    },
+    {
+      "seq_index": 12,
+      "position": 87,
+      "ref": "T",
+      "alt": "C",
+      "delta_logit": 8.8568,
+      "delta_prob": -0.0,
+      "context": "TGCCGCTGCCGC[T>C]GCCGCCGCCGCC"
+    },
+    {
+      "seq_index": 20,
+      "position": 156,
+      "ref": "A",
+      "alt": "G",
+      "delta_logit": 8.7971,
+      "delta_prob": -0.0,
+      "context": "GACTGCGGCGCC[A>G]GCGACGCTCCCG"
+    },
+    {
+      "seq_index": 12,
+      "position": 75,
+      "ref": "T",
+      "alt": "C",
+      "delta_logit": 8.2648,
+      "delta_prob": -0.0,
+      "context": "TGCTGCTGCCGC[T>C]GCCGCTGCCGCT"
+    },
+    {
+      "seq_index": 45,
+      "position": 165,
+      "ref": "T",
+      "alt": "C",
+      "delta_logit": 8.2608,
+      "delta_prob": -0.0,
+      "context": "AAGTCCCGCCCC[T>C]GCCCCGGAGAGG"
+    },
+    {
+      "seq_index": 10,
+      "position": 91,
+      "ref": "T",
+      "alt": "C",
+      "delta_logit": 8.2586,
+      "delta_prob": -0.0,
+      "context": "GCCCTCTCCCGC[T>C]GCCGCCGCCGCC"
+    },
+    {
+      "seq_index": 13,
+      "position": 176,
+      "ref": "A",
+      "alt": "C",
+      "delta_logit": 8.1919,
+      "delta_prob": -0.0,
+      "context": "CGGCGGCGCCGC[A>C]GCGCGCGGCTCC"
+    },
+    {
+      "seq_index": 60,
+      "position": 153,
+      "ref": "A",
+      "alt": "G",
+      "delta_logit": 8.0644,
+      "delta_prob": -0.0,
+      "context": "CGCTCCCGGGCC[A>G]GCGCCTCAGTCG"
+    }
+  ],
+  "verdict": "methods agree but the attributed region is diffuse - no clean motif",
+  "ism_window": [
+    0,
+    251
+  ],
+  "figure": "D:\\kaggle\\genomics\\reports\\promoters-dilated-group.png"
+}
