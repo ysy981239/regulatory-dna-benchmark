@@ -139,16 +139,16 @@
         "q75": 251.0,
         "max": 251
       },
-      "auprc_full": 0.9359,
-      "spearman_len_vs_pred": -0.01280989012979584,
-      "spearman_len_vs_abspred": -0.01280989012979584,
+      "auprc_full": 0.9436,
+      "spearman_len_vs_pred": -0.013590363912585165,
+      "spearman_len_vs_abspred": -0.013590363912585165,
       "by_quintile": [
         {
           "quintile": 1,
           "n": 1807,
           "mean_real_len": 250.9994465965689,
           "pos_frac": 0.009961261413991451,
-          "auprc": 0.6644
+          "auprc": 0.6861
         },
         {
           "quintile": 2,
@@ -162,7 +162,7 @@
           "n": 1807,
           "mean_real_len": 251.0,
           "pos_frac": 0.719977855682373,
-          "auprc": 0.9612
+          "auprc": 0.9655
         },
         {
           "quintile": 4,
@@ -176,7 +176,7 @@
           "n": 1806,
           "mean_real_len": 251.0,
           "pos_frac": 0.9905869364738464,
-          "auprc": 0.9991
+          "auprc": 0.9992
         }
       ]
     },
@@ -195,16 +195,16 @@
         "q75": 251.0,
         "max": 251
       },
-      "auprc_full": 0.9275,
-      "spearman_len_vs_pred": -0.014179407447329153,
-      "spearman_len_vs_abspred": -0.014179407447329153,
+      "auprc_full": 0.9193,
+      "spearman_len_vs_pred": -0.016055470740463835,
+      "spearman_len_vs_abspred": -0.016055470740463835,
       "by_quintile": [
         {
           "quintile": 1,
           "n": 1807,
           "mean_real_len": 250.9994465965689,
           "pos_frac": 0.009961261413991451,
-          "auprc": 0.6132
+          "auprc": 0.5628
         },
         {
           "quintile": 2,
@@ -218,7 +218,7 @@
           "n": 1807,
           "mean_real_len": 251.0,
           "pos_frac": 0.719977855682373,
-          "auprc": 0.9549
+          "auprc": 0.9485
         },
         {
           "quintile": 4,
@@ -232,7 +232,7 @@
           "n": 1806,
           "mean_real_len": 251.0,
           "pos_frac": 0.9905869364738464,
-          "auprc": 0.9989
+          "auprc": 0.9988
         }
       ]
     },
@@ -307,16 +307,16 @@
         "q75": 251.0,
         "max": 251
       },
-      "auprc_full": 0.9408,
-      "spearman_len_vs_pred": -0.014830678859321203,
-      "spearman_len_vs_abspred": -0.014830678859321203,
+      "auprc_full": 0.9634,
+      "spearman_len_vs_pred": -0.01642858398357036,
+      "spearman_len_vs_abspred": -0.01642858398357036,
       "by_quintile": [
         {
           "quintile": 1,
           "n": 1807,
           "mean_real_len": 250.9994465965689,
           "pos_frac": 0.009961261413991451,
-          "auprc": 0.5772
+          "auprc": 0.7005
         },
         {
           "quintile": 2,
@@ -330,7 +330,7 @@
           "n": 1807,
           "mean_real_len": 251.0,
           "pos_frac": 0.719977855682373,
-          "auprc": 0.9635
+          "auprc": 0.9744
         },
         {
           "quintile": 4,
@@ -344,63 +344,7 @@
           "n": 1806,
           "mean_real_len": 251.0,
           "pos_frac": 0.9905869364738464,
-          "auprc": 0.9992
-        }
-      ]
-    },
-    {
-      "run": "human_nontata_promoters__transformer__group__s0",
-      "dataset": "human_nontata_promoters",
-      "model": "transformer",
-      "split": "group",
-      "tensor_len": 251,
-      "padding_fraction": 4.4100772028115124e-07,
-      "real_len": {
-        "min": 250,
-        "q25": 251.0,
-        "median": 251.0,
-        "mean": 250.9998893070622,
-        "q75": 251.0,
-        "max": 251
-      },
-      "auprc_full": 0.8564,
-      "spearman_len_vs_pred": -0.016450856121820005,
-      "spearman_len_vs_abspred": -0.016450856121820005,
-      "by_quintile": [
-        {
-          "quintile": 1,
-          "n": 1807,
-          "mean_real_len": 250.9994465965689,
-          "pos_frac": 0.009961261413991451,
-          "auprc": 0.3269
-        },
-        {
-          "quintile": 2,
-          "n": 1807,
-          "mean_real_len": 251.0,
-          "pos_frac": 0.0,
-          "auprc": 0.0
-        },
-        {
-          "quintile": 3,
-          "n": 1807,
-          "mean_real_len": 251.0,
-          "pos_frac": 0.719977855682373,
-          "auprc": 0.9146
-        },
-        {
-          "quintile": 4,
-          "n": 1807,
-          "mean_real_len": 251.0,
-          "pos_frac": 1.0,
-          "auprc": 1.0
-        },
-        {
-          "quintile": 5,
-          "n": 1806,
-          "mean_real_len": 251.0,
-          "pos_frac": 0.9905869364738464,
-          "auprc": 0.9976
+          "auprc": 0.9996
         }
       ]
     }

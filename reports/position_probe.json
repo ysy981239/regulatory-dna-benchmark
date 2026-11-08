@@ -19,6 +19,40 @@
       "corr": 0.37887777392453936
     },
     {
+      "run": "drosophila_enhancers_stark__basset__group__s1",
+      "dataset": "drosophila_enhancers_stark",
+      "model": "basset",
+      "split": "group",
+      "n_seqs": 1730,
+      "real": {
+        "auprc": 0.8395,
+        "auroc": 0.8797
+      },
+      "shifted": {
+        "auprc": 0.6134,
+        "auroc": 0.6459
+      },
+      "retained_auprc_frac": 0.7306730196545562,
+      "corr": 0.33658091121985584
+    },
+    {
+      "run": "drosophila_enhancers_stark__basset__group__s2",
+      "dataset": "drosophila_enhancers_stark",
+      "model": "basset",
+      "split": "group",
+      "n_seqs": 1730,
+      "real": {
+        "auprc": 0.8401,
+        "auroc": 0.8805
+      },
+      "shifted": {
+        "auprc": 0.6343,
+        "auroc": 0.664
+      },
+      "retained_auprc_frac": 0.7550291631948578,
+      "corr": 0.38227621824625896
+    },
+    {
       "run": "drosophila_enhancers_stark__basset__random__s0",
       "dataset": "drosophila_enhancers_stark",
       "model": "basset",
@@ -42,15 +76,15 @@
       "split": "group",
       "n_seqs": 9034,
       "real": {
-        "auprc": 0.9359,
-        "auroc": 0.9095
+        "auprc": 0.9436,
+        "auroc": 0.9185
       },
       "shifted": {
-        "auprc": 0.9151,
-        "auroc": 0.8781
+        "auprc": 0.9203,
+        "auroc": 0.8833
       },
-      "retained_auprc_frac": 0.9777754033550594,
-      "corr": 0.8835228912017414
+      "retained_auprc_frac": 0.975307333615939,
+      "corr": 0.9359618923256892
     },
     {
       "run": "human_nontata_promoters__basset__group__s0",
@@ -59,15 +93,49 @@
       "split": "group",
       "n_seqs": 9034,
       "real": {
-        "auprc": 0.9275,
-        "auroc": 0.8935
+        "auprc": 0.9193,
+        "auroc": 0.8817
       },
       "shifted": {
-        "auprc": 0.9202,
-        "auroc": 0.8829
+        "auprc": 0.9141,
+        "auroc": 0.8746
       },
-      "retained_auprc_frac": 0.9921293800539084,
-      "corr": 0.9643175206731205
+      "retained_auprc_frac": 0.9943435222451866,
+      "corr": 0.9722212891645898
+    },
+    {
+      "run": "human_nontata_promoters__basset__group__s1",
+      "dataset": "human_nontata_promoters",
+      "model": "basset",
+      "split": "group",
+      "n_seqs": 9034,
+      "real": {
+        "auprc": 0.9377,
+        "auroc": 0.9068
+      },
+      "shifted": {
+        "auprc": 0.929,
+        "auroc": 0.894
+      },
+      "retained_auprc_frac": 0.9907219793110804,
+      "corr": 0.9599503429155294
+    },
+    {
+      "run": "human_nontata_promoters__basset__group__s2",
+      "dataset": "human_nontata_promoters",
+      "model": "basset",
+      "split": "group",
+      "n_seqs": 9034,
+      "real": {
+        "auprc": 0.9403,
+        "auroc": 0.9128
+      },
+      "shifted": {
+        "auprc": 0.9313,
+        "auroc": 0.8993
+      },
+      "retained_auprc_frac": 0.9904285866212911,
+      "corr": 0.9659159912800259
     },
     {
       "run": "human_nontata_promoters__basset__random__s0",
@@ -93,15 +161,15 @@
       "split": "group",
       "n_seqs": 9034,
       "real": {
-        "auprc": 0.9408,
-        "auroc": 0.9173
+        "auprc": 0.9634,
+        "auroc": 0.9475
       },
       "shifted": {
-        "auprc": 0.938,
-        "auroc": 0.9129
+        "auprc": 0.9578,
+        "auroc": 0.9394
       },
-      "retained_auprc_frac": 0.9970238095238095,
-      "corr": 0.9800430722623967
+      "retained_auprc_frac": 0.994187253477268,
+      "corr": 0.987128238175737
     },
     {
       "run": "human_nontata_promoters__transformer__group__s0",
@@ -110,15 +178,15 @@
       "split": "group",
       "n_seqs": 9034,
       "real": {
-        "auprc": 0.8564,
-        "auroc": 0.8116
+        "auprc": 0.8943,
+        "auroc": 0.8635
       },
       "shifted": {
-        "auprc": 0.8098,
-        "auroc": 0.748
+        "auprc": 0.798,
+        "auroc": 0.737
       },
-      "retained_auprc_frac": 0.9455861746847267,
-      "corr": 0.7145388721961584
+      "retained_auprc_frac": 0.8923180140892318,
+      "corr": 0.6734929709530273
     }
   ],
   "kmers": {

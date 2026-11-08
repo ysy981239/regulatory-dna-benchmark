@@ -1,8 +1,12 @@
 """Collect every run under ``runs/`` into one comparison table.
 
-This is the artifact the writeup is built on: one row per (dataset, model, split,
-seed), with the split policy as a first-class column, because the honest headline
-of the project is usually "the same model loses N points when you stop leaking".
+This is the artifact the writeup is built on: one row per (dataset, model, split),
+with the split policy as a first-class column, because the honest headline of the
+project is usually "the same model loses N points when you stop leaking".
+
+Since DEVLOG E6 the same configuration is trained with several seeds, so rows are
+aggregated over seeds: the table shows the mean and the between-seed standard
+deviation.  A difference smaller than that spread is not a difference.
 
 Usage
 -----
@@ -12,7 +16,49 @@ from __future__ import annotations
 
 import argparse
 import json
+import statistics
 from pathlib import Path
+
+
+def _seed_of(run_name: str) -> int:
+    """``...__s2`` -> 2; anything else -> 0."""
+    tail = run_name.rsplit("__s", 1)
+    if len(tail) == 2 and tail[1].isdigit():
+        return int(tail[1])
+    return 0
+
+
+def _mean(xs):
+    xs = [x for x in xs if x is not None]
+    return sum(xs) / len(xs) if xs else float("nan")
+
+
+def _sd(xs):
+    xs = [x for x in xs if x is not None]
+    return statistics.stdev(xs) if len(xs) > 1 else float("nan")
+
+
+def _aggregate(rows):
+    """Group runs that differ only by seed."""
+    groups = {}
+    for r in rows:
+        key = (r["dataset"], r["model"], r["split"], bool(r.get("rc_augment")))
+        groups.setdefault(key, []).append(r)
+    out = []
+    for (ds, model, split, rc), rs in groups.items():
+        rs.sort(key=lambda r: _seed_of(r.get("run", "")))
+        auprc = [r["test"]["auprc"] for r in rs]
+        out.append(dict(
+            dataset=ds, model=model, split=split, rc_augment=rc, n=len(rs),
+            params=rs[0]["params"],
+            auprc=_mean(auprc), auprc_sd=_sd(auprc), auprc_min=min(auprc),
+            auprc_max=max(auprc), ci=rs[0]["test"].get("auprc_ci95"),
+            auroc=_mean([r["test"]["auroc"] for r in rs]),
+            ece=_mean([r["test"].get("ece") for r in rs]),
+            best_f1=_mean([r["test"].get("best_f1") for r in rs]),
+            val_auprc=_mean([r.get("best_val_auprc") for r in rs]),
+        ))
+    return out
 
 
 def main(argv=None):
@@ -26,27 +72,33 @@ def main(argv=None):
     rows = []
     for f in sorted(Path(args.runs).glob("*/metrics.json")):
         try:
-            rows.append(json.loads(f.read_text(encoding="utf-8")))
+            r = json.loads(f.read_text(encoding="utf-8"))
         except json.JSONDecodeError:
             continue
+        r.setdefault("run", f.parent.name)
+        rows.append(r)
     if not rows:
         print(f"no metrics.json under {args.runs!r} - train something first")
         return
 
-    rows.sort(key=lambda r: -r["test"].get(args.sort, 0))
-    header = ("| dataset | model | params | split | rc aug | test AUPRC | 95% CI | "
-              "test AUROC | ECE | best F1 |")
-    lines = [header, "|---|---|---|---|---|---|---|---|---|---|"]
-    for r in rows:
-        t = r["test"]
-        ci = t.get("auprc_ci95")
-        ci_s = f"[{ci[0]:.3f}, {ci[1]:.3f}]" if ci else "-"
-        lines.append(
-            f"| {r['dataset']} | {r['model']} | {r['params']:,} | {r['split']} | "
-            f"{'yes' if r.get('rc_augment') else 'no'} | {t['auprc']:.4f} | {ci_s} | "
-            f"{t['auroc']:.4f} | {t['ece']:.4f} | {t.get('best_f1', float('nan')):.4f} |"
-        )
-    md = "\n".join(lines) + "\n"
+    agg = _aggregate(rows)
+    agg.sort(key=lambda r: -r[args.sort])
+    md = ("| dataset | model | params | split | rc aug | seeds n | test AUPRC "
+          "| between-seed sd | 95% CI (seed 0) | test AUROC | ECE | best F1 |\n"
+          "|---|---|---|---|---|---|---|---|---|---|---|---|\n")
+    for r in agg:
+        ci = r["ci"]
+        ci_s = f"[{ci[0]:.3f}, {ci[1]:.3f}]" if (ci and r["n"] == 1) else "-"
+        sd_s = f"{r['auprc_sd']:.4f}" if r["n"] > 1 else "-"
+        md += (f"| {r['dataset']} | {r['model']} | {r['params']:,} | {r['split']} | "
+               f"{'yes' if r['rc_augment'] else 'no'} | {r['n']} | {r['auprc']:.4f} | {sd_s} | "
+               f"{ci_s} | {r['auroc']:.4f} | {r['ece']:.4f} | {r['best_f1']:.4f} |\n")
+
+    multi = [r for r in agg if r["n"] > 1]
+    if multi:
+        md += ("\nRows with ``seeds n > 1`` are averaged over independent seeds and the "
+               "sd column is the spread between them.  **Any difference between two rows "
+               "smaller than their seed spread is not a difference** - see DEVLOG E6.\n")
 
     # the number every deep model has to beat, kept in the same document so it
     # cannot quietly disappear from the writeup
@@ -57,9 +109,13 @@ def main(argv=None):
         except json.JSONDecodeError:
             continue
     if audits:
-        md += ("\n## Reference baselines (no learned sequence grammar, official test split)\n\n"
-               "A CNN that does not clear the 5-mer linear model is not evidence of "
-               "regulatory grammar, only of a working optimiser.\n\n"
+        md += ("\n## Reference baselines (fitted on the full official training split)\n\n"
+               "These are fitted on the *whole* official train split, i.e. with the "
+               "benchmark's own leakage included, so they are a ceiling for the baseline "
+               "rather than a fair comparison.  The fair, same-split versions are the "
+               "``linear-*`` rows in the main table.  Either way: a CNN that does not clear "
+               "the 5-mer linear model is not evidence of regulatory grammar, only of a "
+               "working optimiser.\n\n"
                "| dataset | baseline | #features | test AUROC | test AUPRC |\n"
                "|---|---|---|---|---|\n")
         for a in audits:
@@ -69,22 +125,16 @@ def main(argv=None):
 
     # the split-policy gap, if both policies exist for a (dataset, model)
     by_key = {}
-    for r in rows:
+    for r in agg:
         by_key.setdefault((r["dataset"], r["model"]), {})[r["split"]] = r
     gaps = []
     for (ds, model), d in by_key.items():
         if "random" in d and "group" in d:
             g, rr = d["group"], d["random"]
-            gaps.append(dict(
-                dataset=ds, model=model,
-                val_group=g.get("best_val_auprc", float("nan")),
-                val_random=rr.get("best_val_auprc", float("nan")),
-                test_group=g["test"]["auprc"], test_random=rr["test"]["auprc"],
-                ece_group=g["test"].get("ece", float("nan")),
-                ece_random=rr["test"].get("ece", float("nan")),
-                brier_group=g["test"].get("brier", float("nan")),
-                brier_random=rr["test"].get("brier", float("nan")),
-            ))
+            gaps.append(dict(dataset=ds, model=model,
+                             val_group=g["val_auprc"], val_random=rr["val_auprc"],
+                             test_group=g["auprc"], test_random=rr["auprc"],
+                             ece_group=g["ece"], ece_random=rr["ece"]))
     if gaps:
         md += ("\n## Optimism from a random row split\n\n"
                "Two numbers move for different reasons.  The **validation** gap is the "

@@ -2,7 +2,10 @@
 data/
 runs/
 runs_legacy/
+runs_preE5/
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
 tests/_*.log
+reports/_*.log
+_tmp_*.py

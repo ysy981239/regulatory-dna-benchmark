@@ -21,6 +21,44 @@
       "pred_corr": -0.04818156432848981
     },
     {
+      "run": "drosophila_enhancers_stark__basset__group__s1",
+      "dataset": "drosophila_enhancers_stark",
+      "model": "basset",
+      "split": "group",
+      "n_seqs": 1730,
+      "real": {
+        "auprc": 0.8395,
+        "auroc": 0.8797
+      },
+      "shuffled": {
+        "auprc": 0.5045,
+        "auroc": 0.5128
+      },
+      "drop_auprc": 0.3350000000000001,
+      "drop_auroc": 0.3669,
+      "retained_auprc_frac": 0.6009529481834425,
+      "pred_corr": -0.011600181904236385
+    },
+    {
+      "run": "drosophila_enhancers_stark__basset__group__s2",
+      "dataset": "drosophila_enhancers_stark",
+      "model": "basset",
+      "split": "group",
+      "n_seqs": 1730,
+      "real": {
+        "auprc": 0.8401,
+        "auroc": 0.8805
+      },
+      "shuffled": {
+        "auprc": 0.5047,
+        "auroc": 0.5097
+      },
+      "drop_auprc": 0.3353999999999999,
+      "drop_auroc": 0.3707999999999999,
+      "retained_auprc_frac": 0.6007618140697537,
+      "pred_corr": -0.016022996275778037
+    },
+    {
       "run": "drosophila_enhancers_stark__basset__random__s0",
       "dataset": "drosophila_enhancers_stark",
       "model": "basset",
@@ -46,17 +84,17 @@
       "split": "group",
       "n_seqs": 9034,
       "real": {
-        "auprc": 0.9359,
-        "auroc": 0.9095
+        "auprc": 0.9436,
+        "auroc": 0.9185
       },
       "shuffled": {
-        "auprc": 0.8151,
-        "auroc": 0.7733
+        "auprc": 0.7989,
+        "auroc": 0.7555
       },
-      "drop_auprc": 0.12079999999999991,
-      "drop_auroc": 0.1362,
-      "retained_auprc_frac": 0.8709263810236137,
-      "pred_corr": 0.5981911669013172
+      "drop_auprc": 0.14469999999999994,
+      "drop_auroc": 0.16300000000000003,
+      "retained_auprc_frac": 0.8466511233573549,
+      "pred_corr": 0.627834699280399
     },
     {
       "run": "human_nontata_promoters__basset__group__s0",
@@ -65,17 +103,55 @@
       "split": "group",
       "n_seqs": 9034,
       "real": {
-        "auprc": 0.9275,
-        "auroc": 0.8935
+        "auprc": 0.9193,
+        "auroc": 0.8817
       },
       "shuffled": {
-        "auprc": 0.7955,
-        "auroc": 0.7598
+        "auprc": 0.8143,
+        "auroc": 0.7737
       },
-      "drop_auprc": 0.132,
-      "drop_auroc": 0.13369999999999993,
-      "retained_auprc_frac": 0.8576819407008086,
-      "pred_corr": 0.5645436685632995
+      "drop_auprc": 0.10499999999999998,
+      "drop_auroc": 0.10799999999999998,
+      "retained_auprc_frac": 0.8857826607201131,
+      "pred_corr": 0.7057588901718282
+    },
+    {
+      "run": "human_nontata_promoters__basset__group__s1",
+      "dataset": "human_nontata_promoters",
+      "model": "basset",
+      "split": "group",
+      "n_seqs": 9034,
+      "real": {
+        "auprc": 0.9377,
+        "auroc": 0.9068
+      },
+      "shuffled": {
+        "auprc": 0.7841,
+        "auroc": 0.7501
+      },
+      "drop_auprc": 0.15359999999999996,
+      "drop_auroc": 0.15670000000000006,
+      "retained_auprc_frac": 0.8361949450783833,
+      "pred_corr": 0.5443014012262694
+    },
+    {
+      "run": "human_nontata_promoters__basset__group__s2",
+      "dataset": "human_nontata_promoters",
+      "model": "basset",
+      "split": "group",
+      "n_seqs": 9034,
+      "real": {
+        "auprc": 0.9403,
+        "auroc": 0.9128
+      },
+      "shuffled": {
+        "auprc": 0.8006,
+        "auroc": 0.7636
+      },
+      "drop_auprc": 0.13970000000000005,
+      "drop_auroc": 0.1492,
+      "retained_auprc_frac": 0.8514303945549292,
+      "pred_corr": 0.6256632481855703
     },
     {
       "run": "human_nontata_promoters__basset__random__s0",
@@ -103,17 +179,17 @@
       "split": "group",
       "n_seqs": 9034,
       "real": {
-        "auprc": 0.9408,
-        "auroc": 0.9173
+        "auprc": 0.9634,
+        "auroc": 0.9475
       },
       "shuffled": {
-        "auprc": 0.8014,
-        "auroc": 0.7669
+        "auprc": 0.7858,
+        "auroc": 0.7457
       },
-      "drop_auprc": 0.13939999999999997,
-      "drop_auroc": 0.15039999999999998,
-      "retained_auprc_frac": 0.8518282312925171,
-      "pred_corr": 0.3856783636322183
+      "drop_auprc": 0.17759999999999998,
+      "drop_auroc": 0.20179999999999998,
+      "retained_auprc_frac": 0.8156528959933569,
+      "pred_corr": 0.570284563784908
     },
     {
       "run": "human_nontata_promoters__transformer__group__s0",
@@ -122,17 +198,17 @@
       "split": "group",
       "n_seqs": 9034,
       "real": {
-        "auprc": 0.8564,
-        "auroc": 0.8116
+        "auprc": 0.8943,
+        "auroc": 0.8635
       },
       "shuffled": {
-        "auprc": 0.8079,
-        "auroc": 0.7467
+        "auprc": 0.7862,
+        "auroc": 0.7254
       },
-      "drop_auprc": 0.0485000000000001,
-      "drop_auroc": 0.06489999999999996,
-      "retained_auprc_frac": 0.9433675852405417,
-      "pred_corr": 0.7153127134980686
+      "drop_auprc": 0.10809999999999997,
+      "drop_auroc": 0.1381,
+      "retained_auprc_frac": 0.8791233366879123,
+      "pred_corr": 0.6521357379458145
     }
   ],
   "note": "shuffled = per-sequence base permutation: composition preserved, order destroyed"

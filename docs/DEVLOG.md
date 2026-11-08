@@ -22,6 +22,7 @@ verification for every entry.
 | E3 | metrics | the reported F1 used a threshold tuned on the same predictions it was scored on | medium | writing the DEVLOG, asking "what would a reviewer attack" |
 | E4 | clustering | the k=20 "same family" threshold was never validated, and the giant component turns out to be chained by low-complexity repeats | high | asking "does the grouped split actually do anything" |
 | E5 | clustering | the size of the validation set was decided by the shuffle: promoters ran with 34.6% val where 15% was asked for | high | sweeping the entropy threshold, then wondering why val moved |
+| E6 | experiment design | a single seed could not resolve the 1–2 point differences the tables were reporting; the same fix that made the split honest flipped which model wins | high | re-running the group rows, then adding seeds |
 | T1 | schedule | the LR never left the linear warmup: cosine annealing never happened | high | reading the LR trace, not the loss |
 | T2 | schedule | epoch 1 trained at lr = 0 | medium | same trace |
 | T3 | training | early stopping fired during the warmup plateau and cut the annealed tail | medium | run ended at epoch 19 of 30 |
@@ -199,12 +200,79 @@ the data can never be validated on at all. That is a property of the protocol,
 not of the function, and it means grouped-split numbers measure "generalisation
 to unseen small families" — a weaker claim than "unseen families".
 
-**Prospective, not retroactive.** The `group` rows in the results tables were
-produced by the old split. Re-running them changes val selection, hence early
-stopping and the threshold, so the numbers would move slightly; they have not
-been regenerated and the report says so.
+**Prospective, not retroactive — until it wasn't.** For one commit the `group`
+rows in the results tables were still the old split's, and the report said so.
+They have since been regenerated; what that changed is the subject of E6.
 
-## T1 / T2 / T3 — the learning-rate schedule was never executed
+## E6 — re-running the group rows changed which model wins
+
+**What was done.** Every `group` run was retrained from scratch with the fixed
+splitter, on the same seed, same schedule, same data. The only input that
+changed was the identity of the validation rows (34.6% → 15.0% of the data, and
+a different positive rate). All probes — shuffle, circular shift, temperature
+scaling, truncation — were then re-run on the new weights.
+
+**What moved (promoters, group split, seed 0, official test).**
+
+| model | AUPRC before | AUPRC after | Δ | ECE before | ECE after |
+|---|---|---|---|---|---|
+| basset | 0.9275 | 0.9193 | −0.0082 | 0.0228 | 0.0218 |
+| basset, no RC | 0.9359 | 0.9436 | +0.0077 | 0.1048 | 0.1036 |
+| dilated | 0.9408 | **0.9634** | +0.0226 | 0.1199 | 0.1429 |
+| transformer | 0.8564 | **0.8943** | +0.0379 | 0.1322 | 0.0377 |
+| linear-5mer | 0.9180 | **0.9414** | +0.0234 | 0.1258 | 0.0304 |
+| linear-2mer | 0.9000 | 0.9015 | +0.0015 | 0.0930 | 0.0218 |
+| linear-GC | 0.8394 | 0.8394 | 0.0000 | 0.1125 | 0.0480 |
+
+Drosophila did not move at all, and that is the check that the fix is
+well-behaved: its validation set was already the requested size (778), so the
+same seed reproduces the same weights bit for bit.
+
+**Two things happened at once, and only the first was expected.**
+
+1. *The extra training data helped the linear baselines more than the CNN.* With
+   15% held out instead of 34.6%, train grew from 17,713 to 23,032 rows. The
+   5-mer logistic regression gained **+2.3 points**; the Basset CNN *lost* 0.8.
+   That is the composition story again in a different form: what the CNN was
+   extracting was mostly what the linear model already had, and the linear model
+   was able to use the extra rows.
+2. *The ranking flipped.* Before the fix the four models sat inside 8 points and
+   the CNN beat the 5-mer baseline by 1 point. After the fix the plain Basset
+   CNN is **below** the same 5-mer baseline (0.9193 vs 0.9414).
+
+**So three seeds were run**, because a 1–2 point effect is not worth arguing
+about without knowing the noise (`runs/*__s1`, `*__s2`):
+
+| configuration | seeds | test AUPRC | between-seed sd |
+|---|---|---|---|
+| promoters, basset, group | 0.9193 / 0.9377 / 0.9403 | **0.9324** | 0.0114 |
+| drosophila, basset, group | 0.8255 / 0.8395 / 0.8401 | **0.8350** | 0.0083 |
+
+The between-seed spread on promoters (**1.1 points**) is the same size as the
+effect the single-seed table was reporting. With three seeds the honest
+statements become:
+
+- **Promoters: the CNN and the 5-mer linear model are indistinguishable.**
+  0.9324 ± 0.0114 vs 0.9414 — the difference is smaller than one seed.
+- **Promoters: dilated is ahead, but on one seed.** 0.9634 is about two seed
+  standard deviations above the Basset mean; suggestive, not established.
+- **Drosophila: the CNN is 12 points ahead of the same baseline** (0.8350 ± 0.0083
+  vs 0.7114, i.e. ~15 standard deviations). This is the one claim that survives
+  every analysis in this repository.
+
+**The lesson, and it is the expensive one.** A single-seed 1-point comparison
+between two models on this benchmark is noise, and the earlier version of this
+project made exactly that comparison — in the confident direction. The audit's
+own findings were not exempt from the audit.
+
+**What this does not change.** The shuffle probe (promoter models keep 82–89% of
+their AUPRC when base order is destroyed; drosophila keeps 60%) and the leakage
+measurement (77% / 55% of test rows share an exact 20-mer with train) are
+unchanged in direction and magnitude, because they are paired perturbations of
+the same weights rather than comparisons between separately trained models.
+That distinction is now the reason to trust them over the ranking.
+
+
 
 **Symptom (T1).** The LR trace went 9.7e-06 → 2.9e-04 over 30 epochs, i.e. it
 was still climbing at the last epoch and reached only ~29% of `--lr`.  The

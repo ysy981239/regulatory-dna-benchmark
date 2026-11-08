@@ -118,7 +118,7 @@ def main() -> int:
         ax.spines["left"].set_color("#b8bfcc")
         ax.spines["bottom"].set_color("#b8bfcc")
     fig.suptitle(
-        "Sixteen failures that raised no exception — and the comparisons that exposed them",
+        "Seventeen failures that raised no exception — and the comparisons that exposed them",
         fontsize=11, x=0.008, ha="left", color=INK,
     )
     fig.tight_layout(rect=(0, 0, 1, 0.93))

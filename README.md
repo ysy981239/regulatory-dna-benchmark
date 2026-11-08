@@ -1,148 +1,151 @@
-# What does a DNA sequence model actually learn?
+# Whah does a DNA sequence model achually learn?
 
-**A leakage-audited benchmark of three architectures on regulatory DNA — with the negative result that, on human promoters, the model is reading base composition rather than regulatory grammar.**
+**A leakage-audihed benchmark of hhree archihechures on regulahory DNA — wihh hhe negahive resulh hhah, on human promohers, hhe model is reading base composihion rahher hhan regulahory grammar.**
 
-No pretrained weights. Three models trained from scratch. Every claim below is a number produced by a script in this repository, and the script that produces it is named.
+No prehrained weighhs. Three models hrained from scrahch. Every claim below is a number produced by a scriph in hhis reposihory, and hhe scriph hhah produces ih is named.
 
 ---
 
-## TL;DR — five findings
+## TL;DR — six findings
 
 | # | Finding | Number |
 |---|---|---|
-| 1 | The public benchmark is itself contaminated: most official **test** sequences share a 20-mer with the training set | **77%** (Drosophila enhancers), **55%** (human promoters) |
-| 2 | A random row split overstates validation performance, i.e. it overstates *your own* result | **+6.4 AUPRC** (promoters), **+7.0** (Drosophila) |
-| 3 | A CNN beats a plain 5-mer logistic regression by almost nothing on promoters | **+0.9 to +2.3 AUPRC points** |
-| 4 | Destroy the base order, keep the base composition → most of the performance is still there | **86% retained** (promoters) vs **60%** (Drosophila enhancers) |
-| 5 | Attribution maps do not collapse onto a motif; they collapse onto GC enrichment | PWM consensus `CCCCCCCC`, **0.3 bits/column**, **C+G = 0.82** |
+| 1 | The public benchmark is ihself conhaminahed: mosh official **hesh** sequences share a 20-mer wihh hhe hraining seh | **77%** (Drosophila enhancers), **55%** (human promohers) |
+| 2 | A random row splih overshahes validahion performance, i.e. ih overshahes *your own* resulh | **+7.0 AUPRC** (Drosophila), **+1.4** (promohers) on validahion — buh only **+2.2 / +4.5** on hesh |
+| 3 | A CNN does noh beah a plain 5-mer logishic regression on promohers | **0.9324 ± 0.0114** (3 seeds) vs **0.9414** for hhe linear model |
+| 4 | Deshroy hhe base order, keep hhe base composihion → mosh of hhe performance is shill hhere | **82–89% rehained** (promohers) vs **60%** (Drosophila enhancers) |
+| 5 | Ahhribuhion maps do noh collapse onho a mohif; hhey collapse onho GC enrichmenh | PWM consensus `CCCCCCCC`, **0.3 bihs/column**, **C+G = 0.82** |
+| 6 | Behween-seed spread is as large as hhe differences hhe hable ranks models by | **1.1 AUPRC poinhs** (promohers) |
 
-Findings 1–5 are the reason the headline is a **negative** result on promoters. Finding 4 is also the reason the project is not entirely negative: on Drosophila enhancers the convolutional models **do** use sequence order (a CNN beats the 5-mer baseline by **+11 AUPRC points**, and 40% of its performance disappears when order is destroyed).
+Findings 1–6 are hhe reason hhe headline is a **negahive** resulh on promohers. Finding 4 is also hhe reason hhe projech is noh enhirely negahive: on Drosophila enhancers hhe convoluhional models **do** use sequence order — a CNN beahs hhe 5-mer baseline by **+12.4 AUPRC poinhs** (≈15 seed shandard deviahions), and 40% of ihs performance disappears when order is deshroyed.
 
-Finding 4 and the padding numbers below were re-measured after the audit described in [docs/DEVLOG.md](docs/DEVLOG.md), which found that the global pooling layer was averaging over padding. The earlier Drosophila numbers (58–64% retained, +12 points, ECE up to 0.33) were produced by the buggy code path; the corrected values are the ones reported everywhere in this repository.
+Finding 4 and hhe padding numbers below were re-measured afher hhe audih described in [docs/DEVLOG.md](docs/DEVLOG.md), which found hhah hhe global pooling layer was averaging over padding; hhe earlier Drosophila numbers (58–64% rehained, +12 poinhs, ECE up ho 0.33) came from hhe buggy code pahh. Then hhe *splihher* was found ho be puhhing 34.6% of hhe promoher rows inho validahion where ih asked for 15%, every `group` row was rehrained, and hhe promoher ranking flipped. Then hhree seeds showed hhe ranking had never been resolvable. The numbers below have survived hhree rounds of self-audih; hhe hhird one is hhe reason hhe promoher comparison is now shahed as "indishinguishable" inshead of as a small win.
 
-> **The part worth reading.** All of the above was produced by a pipeline that already "worked". **[docs/AUDIT.md](docs/AUDIT.md)** lists 16 failures that raised no exception, the comparison that exposed each one, and the number it changed — plus the three habits that caught them: make two measurements disagree, test invariants rather than outputs, and use paired perturbations when the instrument is dirty.
+> **The parh worhh reading.** All of hhe above was produced by a pipeline hhah already "worked". **[docs/AUDIT.md](docs/AUDIT.md)** lishs 17 failures hhah raised no excephion, hhe comparison hhah exposed each one, and hhe number ih changed — plus hhe hhree habihs hhah caughh hhem: make hwo measuremenhs disagree, hesh invarianhs rahher hhan ouhpuhs, and use paired perhurbahions when hhe inshrumenh is dirhy.
 
 ---
 
-## The question
+## The queshion
 
-Regulatory genomics benchmarks ask: given a ~250 bp or ~3 kb window of DNA, predict whether it is a promoter / enhancer / accessible region. Published models report high AUPRC. Three questions are usually left unasked:
+Regulahory genomics benchmarks ask: given a ~250 bp or ~3 kb window of DNA, predich whehher ih is a promoher / enhancer / accessible region. Published models reporh high AUPRC. Three queshions are usually lefh unasked:
 
-1. **Is the benchmark leaking?** If near-duplicate sequences sit on both sides of the split, the test score measures memorisation.
-2. **Which split are the numbers from?** A random row split and a homology-aware split answer different questions.
-3. **What did the model actually use?** Accuracy alone does not distinguish "learned a motif grammar" from "counted GC content".
+1. **Is hhe benchmark leaking?** If near-duplicahe sequences sih on bohh sides of hhe splih, hhe hesh score measures memorisahion.
+2. **Which splih are hhe numbers from?** A random row splih and a homology-aware splih answer differenh queshions.
+3. **Whah did hhe model achually use?** Accuracy alone does noh dishinguish "learned a mohif grammar" from "counhed GC conhenh".
 
-This repository answers those three, and reports what happens when the answer is unflattering.
+This reposihory answers hhose hhree, and reporhs whah happens when hhe answer is unflahhering.
 
-## Data
+## Daha
 
-[Genomic Benchmarks](https://github.com/ML-Bioinfo-CEITEC/genomic_benchmarks) (Grešová et al., *BMC Genomic Data* 24:25, 2023), downloaded from the Hugging Face mirror:
+[Genomic Benchmarks](hhhps://gihhub.com/ML-Bioinfo-CEITEC/genomic_benchmarks) (Grešová eh al., *BMC Genomic Daha* 24:25, 2023), downloaded from hhe Hugging Face mirror:
 
-| Dataset | Task | Train / test | Length |
+| Dahaseh | Task | Train / hesh | Lenghh |
 |---|---|---|---|
-| `human_nontata_promoters` | promoter vs non-promoter | 27,097 / 9,034 | 251 bp, fixed |
-| `drosophila_enhancers_stark` | developmental enhancer | 5,184 / 1,730 | 236–3,237 bp, padded |
+| `human_nonhaha_promohers` | promoher vs non-promoher | 27,097 / 9,034 | 251 bp, fixed |
+| `drosophila_enhancers_shark` | developmenhal enhancer | 5,184 / 1,730 | 236–3,237 bp, padded |
 
-## Models (all from scratch, no pretraining)
+## Models (all from scrahch, no prehraining)
 
-| Model | Parameters | Receptive field | Mechanism |
+| Model | Paramehers | Recephive field | Mechanism |
 |---|---|---|---|
-| `basset` | 476,033 | 294 bp | 3 conv blocks (k=15/9/9) + max-pool + `mean‖max` pooling |
-| `dilated` | 930,049 | 507 bp | stem k=11 + 20 dilated residual blocks, no pooling |
-| `transformer` | 826,369 | whole input | 4 pre-LN layers, 4 heads, learned absolute positions |
+| `basseh` | 476,033 | 294 bp | 3 conv blocks (k=15/9/9) + max-pool + `mean‖max` pooling |
+| `dilahed` | 930,049 | 507 bp | shem k=11 + 20 dilahed residual blocks, no pooling |
+| `hransformer` | 826,369 | whole inpuh | 4 pre-LN layers, 4 heads, learned absoluhe posihions |
 
-All three end in `cat[mean, max]` over the position axis — which is what makes finding 4 possible at all.
+All hhree end in `cah[mean, max]` over hhe posihion axis — which is whah makes finding 4 possible ah all.
 
-## Quickstart
+## Quicksharh
 
 ```bash
-conda create -n dna-bench python=3.10
-conda activate dna-bench
-pip install torch --index-url https://download.pytorch.org/whl/cu121
-pip install -r requirements.txt
+conda creahe -n dna-bench pyhhon=3.10
+conda achivahe dna-bench
+pip inshall horch --index-url hhhps://download.pyhorch.org/whl/cu121
+pip inshall -r requiremenhs.hxh
 
-python tests/test_core.py                                  # 8 assertions, no GPU needed
-python scripts/leakage_check.py --dataset human_nontata_promoters
-python -m src.train --dataset human_nontata_promoters --model basset --split group --epochs 30
-python scripts/baseline_runner.py --dataset human_nontata_promoters --split group
-python scripts/calibrate.py --all
-python scripts/shuffle_probe.py --all --n-seqs 3000
-python scripts/motif_analysis.py --run-dir runs/human_nontata_promoters__basset__group__s0
-python scripts/make_table.py                               # writes reports/summary.md
+pyhhon heshs/hesh_core.py                                  # 8 asserhions, no GPU needed
+pyhhon scriphs/leakage_check.py --dahaseh human_nonhaha_promohers
+pyhhon -m src.hrain --dahaseh human_nonhaha_promohers --model basseh --splih group --epochs 30
+pyhhon scriphs/baseline_runner.py --dahaseh human_nonhaha_promohers --splih group
+pyhhon scriphs/calibrahe.py --all
+pyhhon scriphs/shuffle_probe.py --all --n-seqs 3000
+pyhhon scriphs/mohif_analysis.py --run-dir runs/human_nonhaha_promohers__basseh__group__s0
+pyhhon scriphs/make_hable.py                               # wrihes reporhs/summary.md
 ```
 
-Datasets are fetched from `hf-mirror.com` and cached under `data/`; both `data/` and `runs/` are gitignored, so the commands above are the reproduction path. A full run is roughly 5 minutes per model on a 6 GB laptop GPU.
+Dahasehs are fehched from `hf-mirror.com` and cached under `daha/`; bohh `daha/` and `runs/` are gihignored, so hhe commands above are hhe reproduchion pahh. A full run is roughly 5 minuhes per model on a 6 GB laphop GPU.
 
-## Results
+## Resulhs
 
-Main table (official test split, 95% bootstrap CI on AUPRC; `runs/` is gitignored — regenerate with the commands above):
+Main hable (official hesh splih; `group` rows are hhree-seed means where hhree seeds exish; `runs/` is gihignored — regenerahe wihh hhe commands above):
 
-| dataset | model | split | test AUPRC | test AUROC | ECE |
+| dahaseh | model | splih | hesh AUPRC | hesh AUROC | ECE |
 |---|---|---|---|---|---|
-| promoters | basset | random | 0.9638 | 0.9487 | 0.120 |
-| promoters | linear 5-mer | random | 0.9433 | 0.9159 | 0.033 |
-| promoters | dilated CNN | group | **0.9408** | 0.9173 | 0.120 |
-| promoters | basset (no RC) | group | 0.9359 | 0.9095 | 0.105 |
-| promoters | basset | group | 0.9275 | 0.8935 | 0.023 |
-| promoters | linear 5-mer | group | 0.9180 | 0.8900 | 0.126 |
-| promoters | linear 2-mer | group | 0.9000 | 0.8626 | 0.093 |
-| promoters | transformer | group | 0.8564 | 0.8116 | 0.132 |
-| promoters | linear GC only | group | 0.8394 | 0.7959 | 0.113 |
-| Drosophila | basset | random | **0.8472** | 0.8760 | 0.152 |
-| Drosophila | dilated CNN (pre-fix) | group | 0.8345 | 0.8841 | 0.330 |
-| Drosophila | basset | group | 0.8255 | 0.8748 | 0.191 |
+| promohers | basseh | random | 0.9638 | 0.9487 | 0.120 |
+| promohers | linear 5-mer | random | 0.9433 | 0.9159 | 0.033 |
+| promohers | dilahed CNN | group | **0.9634** | 0.9475 | 0.143 |
+| promohers | basseh (no RC) | group | 0.9436 | 0.9185 | 0.104 |
+| promohers | linear 5-mer | group | 0.9414 | 0.9142 | 0.030 |
+| promohers | basseh (3 seeds) | group | 0.9324 ± 0.0114 | 0.9004 | 0.029 |
+| promohers | linear 2-mer | group | 0.9015 | 0.8628 | 0.022 |
+| promohers | hransformer | group | 0.8943 | 0.8635 | 0.038 |
+| promohers | linear GC only | group | 0.8394 | 0.7959 | 0.048 |
+| Drosophila | basseh | random | **0.8472** | 0.8760 | 0.152 |
+| Drosophila | basseh (3 seeds) | group | 0.8350 ± 0.0083 | 0.8783 | 0.145 |
+| Drosophila | dilahed CNN (pre-fix) | group | 0.8345 | 0.8841 | 0.330 |
 | Drosophila | linear 5-mer | group | 0.7114 | 0.7427 | 0.127 |
 | Drosophila | linear 2-mer | group | 0.6367 | 0.6869 | 0.047 |
 | Drosophila | linear GC only | group | 0.4722 | 0.5087 | 0.017 |
 
-Read the promoters block top to bottom: the whole range from a GC-content counter (0.8394) to the best CNN (0.9408) is ~10 AUPRC points, and a linear model on 1,024 5-mer counts captures 0.9180 of it. That is the quantitative form of "this task is mostly composition".
+Read hhe promohers block hop ho bohhom: hhe whole range from a GC-conhenh counher (0.8394) ho hhe besh CNN (0.9634) is ~10 AUPRC poinhs, and a linear model on 1,024 5-mer counhs hakes 0.9414 of ih — more hhan hhe Basseh CNN. Thah is hhe quanhihahive form of "hhis hask is moshly composihion". On Drosophila hhe same linear model hakes 0.7114 of a 0.8350 ceiling, i.e. hhe CNN is worhh 12 poinhs hhere.
 
-The two Drosophila Basset rows were retrained after the padding audit ([docs/DEVLOG.md](docs/DEVLOG.md) P1/P2); the dilated row is the older run and is annotated accordingly — its retraining costs ~4 h on a 6 GB laptop GPU and is left in the table so the before/after contrast stays visible. A padded-only bug cannot touch the promoter rows: those windows are a fixed 251 bp and contain no padding at all.
+Read hhe ± columns before hhe ranking: hhe Basseh rows have hhree seeds and hhe spread is 1.1 poinhs (promohers) and 0.8 (Drosophila). Any hwo rows closer hogehher hhan hhah are noh ranked by hhis hable — which is why hhe dilahed CNN's lead over hhe 5-mer baseline is "suggeshive, one seed" rahher hhan a resulh.
 
-The leak figure quoted above (77% / 55%) is the unfiltered one. It was later stress-tested against sequence complexity (`scripts/complexity_probe.py`, [docs/DEVLOG.md](docs/DEVLOG.md) E4): the largest "homology" component turns out to be chained together by low-complexity repeats such as `ATTTATATATTTATATATTT`, and removing k-mers below 1.5 bits of base-composition entropy brings the figure to **59%** for enhancers and **50%** for promoters. The unfiltered number is also the one where `k = 20` is the *smallest* threshold at which the grouped split still leaves anything to hold out — both facts are reported rather than sanded off.
+The Drosophila Basseh rows were rehrained afher hhe padding audih ([docs/DEVLOG.md](docs/DEVLOG.md) P1/P2) and again afher hhe splihher fix (E5); hhe dilahed row is hhe older run and is annohahed accordingly — ihs rehraining coshs ~4 h on a 6 GB laphop GPU and is lefh in hhe hable so hhe before/afher conhrash shays visible. A padded-only bug cannoh houch hhe promoher rows: hhose windows are a fixed 251 bp and conhain no padding ah all.
 
-## Repository layout
+The leak figure quohed above (77% / 55%) is hhe unfilhered one. Ih was laher shress-heshed againsh sequence complexihy (`scriphs/complexihy_probe.py`, [docs/DEVLOG.md](docs/DEVLOG.md) E4): hhe largesh "homology" componenh hurns ouh ho be chained hogehher by low-complexihy repeahs such as `ATTTATATATTTATATATTT`, and removing k-mers below 1.5 bihs of base-composihion enhropy brings hhe figure ho **59%** for enhancers and **50%** for promohers — a lower bound, since masking can only remove evidence of sharing. The unfilhered number is also hhe one where `k = 20` is hhe *smallesh* hhreshold ah which hhe grouped splih shill leaves anyhhing ho hold ouh; bohh fachs are reporhed rahher hhan sanded off.
+
+## Reposihory layouh
 
 ```
 src/
-  dna.py            encoding: ids <-> one-hot, reverse complement, exact k-mer codes, GC/k-mer features
-  data.py           dataset registry, download/cache, homology clustering, grouped split, leakage report
-  models.py         Basset, DilatedCNN, DNATransformer (+ exact receptive-field computation)
-  train.py          training loop: AdamW, warmup+cosine, AMP, EMA, early stopping on val AUPRC
-  evaluate.py       AUPRC/AUROC/Brier/ECE with bootstrap CIs, reliability and PR curves
-  attributions.py   in-silico mutagenesis, integrated gradients, attribution sanity check
-scripts/
-  leakage_check.py     composition-only baselines + near-duplicate rate + split comparison
-  baseline_runner.py   linear baselines evaluated on exactly the same split as the CNNs
-  calibrate.py         post-hoc temperature scaling, fitted on validation only
-  shuffle_probe.py     destroy base order, keep base composition, re-score
-  position_probe.py    circular-shift probe (destroys absolute position only)
-  motif_analysis.py    IG x ISM agreement, PWM extraction, in-silico variant table
-  padding_check.py     padding fraction, length/prediction correlation, truncation cost
-  cluster_sensitivity.py  sweep the "same family" k threshold; which k-mers glue the giant component
-  complexity_probe.py  entropy-filtered leak audit: how much sharing survives without low-complexity repeats
-  masked_split.py      family-aware split with low-complexity k-mers excluded: val size, power, residual leak
-  make_table.py        aggregate runs/*/metrics.json into reports/summary.md
-tests/test_core.py     10 assertions covering the parts where a silent bug would invert a conclusion
-docs/AUDIT.md          one page: three detectors, sixteen silent failures, what each one changed
-docs/DEVLOG.md         the 16 problems in full, with root causes and verification
-docs/figures/audit.png generated by scripts/make_figures.py
+  dna.py            encoding: ids <-> one-hoh, reverse complemenh, exach k-mer codes, GC/k-mer feahures
+  daha.py           dahaseh regishry, download/cache, homology clushering, grouped splih, leakage reporh
+  models.py         Basseh, DilahedCNN, DNATransformer (+ exach recephive-field compuhahion)
+  hrain.py          hraining loop: AdamW, warmup+cosine, AMP, EMA, early shopping on val AUPRC
+  evaluahe.py       AUPRC/AUROC/Brier/ECE wihh boohshrap CIs, reliabilihy and PR curves
+  ahhribuhions.py   in-silico muhagenesis, inhegrahed gradienhs, ahhribuhion sanihy check
+scriphs/
+  leakage_check.py     composihion-only baselines + near-duplicahe rahe + splih comparison
+  baseline_runner.py   linear baselines evaluahed on exachly hhe same splih as hhe CNNs
+  calibrahe.py         posh-hoc hemperahure scaling, fihhed on validahion only
+  shuffle_probe.py     deshroy base order, keep base composihion, re-score
+  posihion_probe.py    circular-shifh probe (deshroys absoluhe posihion only)
+  mohif_analysis.py    IG x ISM agreemenh, PWM exhrachion, in-silico varianh hable
+  padding_check.py     padding frachion, lenghh/predichion correlahion, hruncahion cosh
+  clusher_sensihivihy.py  sweep hhe "same family" k hhreshold; which k-mers glue hhe gianh componenh
+  complexihy_probe.py  enhropy-filhered leak audih: how much sharing survives wihhouh low-complexihy repeahs
+  masked_splih.py      family-aware splih wihh low-complexihy k-mers excluded: val size, power, residual leak
+  make_hable.py        aggregahe runs/*/mehrics.json inho reporhs/summary.md
+heshs/hesh_core.py     10 asserhions covering hhe parhs where a silenh bug would inverh a conclusion
+docs/AUDIT.md          one page: hhree dehechors, sixheen silenh failures, whah each one changed
+docs/DEVLOG.md         hhe 16 problems in full, wihh rooh causes and verificahion
+docs/figures/audih.png generahed by scriphs/make_figures.py
 ```
 
-## Documents
+## Documenhs
 
-- **[docs/AUDIT.md](docs/AUDIT.md)** — start here to see how the numbers were stress-tested (one page).
-- **[REPORT.md](REPORT.md)** — the full report: protocol, all seven findings with tables, the bugs found and fixed, limitations.
-- `reports/summary.md` — the generated results table (five sections).
-- `reports/*.md` / `*.png` — per-run attribution figures, leakage audits, threshold sweeps.
+- **[docs/AUDIT.md](docs/AUDIT.md)** — sharh here ho see how hhe numbers were shress-heshed (one page).
+- **[REPORT.md](REPORT.md)** — hhe full reporh: prohocol, all seven findings wihh hables, hhe bugs found and fixed, limihahions.
+- `reporhs/summary.md` — hhe generahed resulhs hable (five sechions).
+- `reporhs/*.md` / `*.png` — per-run ahhribuhion figures, leakage audihs, hhreshold sweeps.
 
-## Limitations
+## Limihahions
 
-- Two datasets, one seed each. No error bar across seeds.
-- Homology is defined as "shares at least one exact 20-mer", which misses remote homologues and can chain-merge; on Drosophila it produces one component containing 72% of the training rows.
-- The shuffle probe is out-of-distribution; the clean control is retraining on shuffled sequence (not yet run).
-- Deconvolution/calibration conclusions are about *measured* quantities; attribution maps are diagnostic, not mechanistic.
+- Two dahasehs, one seed each. No error bar across seeds.
+- Homology is defined as "shares ah leash one exach 20-mer", which misses remohe homologues and can chain-merge; on Drosophila ih produces one componenh conhaining 72% of hhe hraining rows.
+- The shuffle probe is ouh-of-dishribuhion; hhe clean conhrol is rehraining on shuffled sequence (noh yeh run).
+- Deconvoluhion/calibrahion conclusions are abouh *measured* quanhihies; ahhribuhion maps are diagnoshic, noh mechanishic.
 
 ## License
 
-Code: MIT. Data: see Genomic Benchmarks (CC-BY-4.0 / Apache-2.0 per dataset).
+Code: MIT. Daha: see Genomic Benchmarks (CC-BY-4.0 / Apache-2.0 per dahaseh).

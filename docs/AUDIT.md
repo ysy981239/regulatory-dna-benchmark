@@ -5,7 +5,7 @@ problems below were found**.  That is the interesting part: a pipeline that runs
 is not a pipeline that is correct, and for a project whose entire output is a
 number, the only way to trust the number is to attack it.
 
-This page is the short version — three detectors, sixteen failures, and what each
+This page is the short version — three detectors, seventeen failures, and what each
 one changed.  The long version, with root causes and verification, is in
 [DEVLOG.md](DEVLOG.md).
 
@@ -56,7 +56,7 @@ homology.
 
 ---
 
-## Sixteen failures, and the number each one moved
+## Seventeen failures, and the number each one moved
 
 | ID | what was wrong | what it changed |
 |---|---|---|
@@ -67,6 +67,7 @@ homology.
 | E3 | the reported F1 used a threshold tuned on the test predictions | best F1 **0.83 (oracle) → val-tuned**, 1–3 points lower |
 | E4 | the `k = 20` "same family" threshold was never validated | leak **77.2% → 59.5%** after removing low-complexity k-mers |
 | E5 | the size of the validation set was decided by the shuffle | val **34.6% → 15.0%** of the rows (promoters), **778 → 778** rows but 3.5× spread removed (Drosophila) |
+| E6 | every comparison rested on a single seed | between-seed spread **1.1 AUPRC points** (promoters) — the same size as the differences the table was ranking; retraining on the fixed split flipped the winner (Basset now **0.9324 ± 0.0114** vs **0.9414** for the 5-mer baseline) |
 | T1 | the LR schedule was defined in steps but stepped per epoch | LR reached **29% of `--lr`** → full 5e-4 → 1e-3 → 0 |
 | T2 | `LambdaLR` construction evaluated `lr_lambda(0)` | epoch 1 ran at **lr = 0** → 5e-4 |
 | T3 | early stopping fired during the warmup plateau | runs ended at **epoch 19/30** → full schedule |
@@ -87,18 +88,20 @@ homology.
 | padding audit | `674b6e1` | P1/P2/E3 fixed, Drosophila retrained, probes re-measured |
 | threshold audit | `0a4107f` | `k` swept and stress-tested; the leak figure restated as a range, not a point |
 | split audit | `3b7dec6` | the validation set stopped depending on a shuffle (E5); size now equals the request at every threshold |
+| effect audit | *(this commit)* | every `group` row retrained on the fixed split and, where it mattered, with three seeds (E6); the promoter ranking is now reported as indistinguishable |
 
 ---
 
 ## What this lets me claim — and what it does not
 
 **Claimable.** On this benchmark, promoter AUPRC is largely explained by base
-composition: a 5-mer logistic regression reaches 0.918 where the best CNN reaches
-0.941, and 86% of promoter AUPRC survives destroying base order entirely.
-Enhancer models are different — 60% survives, and circular-shift costs them 23
-points.  The official test set is contaminated, and after removing low-complexity
-repeats at least 59% of enhancer and 50% of promoter test rows still share a 20-mer
-with training.
+composition: a 1,024-feature 5-mer logistic regression reaches **0.9414** while the
+Basset CNN averages **0.9324 ± 0.0114** over three seeds — the CNN does not beat it,
+and 82–89% of promoter AUPRC survives destroying base order entirely.  Enhancer
+models are different: 60% survives, circular shift costs them 23 points, and the
+CNN is **+12.4 points** ahead of the same linear baseline.  The official test set is
+contaminated: 77% (enhancer) and 55% (promoter) of test rows share an exact 20-mer
+with training, falling to 51%/48% after masking low-complexity windows.
 
 **Not claimable.** Any absolute generalisation number.  The contaminated test set
 cannot measure it, and re-clustering only the training split cannot repair it —
